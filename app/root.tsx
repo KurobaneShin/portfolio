@@ -33,7 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return json(
     {
-      theme: getTheme(),
+      theme: getTheme() ?? "light",
     },
   );
 }
@@ -62,8 +62,14 @@ export function App() {
 export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>();
   return (
-    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
-      <App />
-    </ThemeProvider>
+    <>
+      <ThemeProvider
+        // @ts-expect-error start with light theme
+        specifiedTheme={data.theme}
+        themeAction="/action/set-theme"
+      >
+        <App />
+      </ThemeProvider>
+    </>
   );
 }
