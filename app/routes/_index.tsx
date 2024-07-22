@@ -1,28 +1,42 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Kurobane" },
+    { name: "description", content: data?.description },
   ];
 };
 
-import { Link } from "@remix-run/react";
+import { json, Link } from "@remix-run/react";
+import { CodeIcon, CodepenIcon, Laptop2Icon, MoveIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { LangChooser } from "~/components/custom/LangChooser";
 import { ModeToggle } from "~/components/custom/ModeToggle";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import i18nServer from "~/modules/i18n.server";
 
-export default function Component() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const t = await i18nServer.getFixedT(request);
+
+  return json({ description: t("description") });
+}
+
+export default function Index() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link to="#" className="flex items-center justify-center">
-          <LaptopIcon className="h-6 w-6" />
-          <span className="sr-only">Kurobane</span>
+          <Laptop2Icon className="h-6 w-6" />
+          <span className="sr-only">{t("title")}</span>
         </Link>
         <nav className="ml-auto flex items-center gap-4 sm:gap-6">
           <ModeToggle />
+          <LangChooser />
+
           <Link
             to="#"
             className="text-sm font-medium hover:underline underline-offset-4"
@@ -70,7 +84,7 @@ export default function Component() {
                   Kurobane
                 </h1>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Full-stack developer with expertise in React, Node.js, and Go.
+                  {t("description")}
                 </p>
                 <div className="space-x-4 mt-6">
                   <Link
@@ -89,11 +103,11 @@ export default function Component() {
               </div>
               <div className="flex flex-col items-start space-y-4">
                 <img
-                  src="/placeholder.svg"
+                  src="https://github.com/kurobaneshin.png"
                   width={400}
                   height={400}
                   alt="Hero"
-                  className="mx-auto aspect-square overflow-hidden rounded-xl object-cover"
+                  className="mx-auto aspect-square overflow-hidden rounded-xl obect-cover"
                 />
               </div>
             </div>
@@ -115,7 +129,7 @@ export default function Component() {
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
                 <img
-                  src="/placeholder.svg"
+                  src="https://github.com/kurobaneshin.png"
                   width={300}
                   height={200}
                   alt="Project 1"
@@ -171,7 +185,7 @@ export default function Component() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+            <div className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12">
               <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
                 <CodepenIcon className="h-12 w-12" />
                 <h3 className="text-lg font-bold">React</h3>
@@ -427,111 +441,5 @@ export default function Component() {
         </nav>
       </footer>
     </div>
-  );
-}
-
-function CodepenIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-      <line x1="12" x2="12" y1="22" y2="15.5" />
-      <polyline points="22 8.5 12 15.5 2 8.5" />
-      <polyline points="2 15.5 12 8.5 22 15.5" />
-      <line x1="12" x2="12" y1="2" y2="8.5" />
-    </svg>
-  );
-}
-
-function LaptopIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16" />
-    </svg>
-  );
-}
-
-function MoveIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="5 9 2 12 5 15" />
-      <polyline points="9 5 12 2 15 5" />
-      <polyline points="15 19 12 22 9 19" />
-      <polyline points="19 9 22 12 19 15" />
-      <line x1="2" x2="22" y1="12" y2="12" />
-      <line x1="12" x2="12" y1="2" y2="22" />
-    </svg>
-  );
-}
-
-function CodeIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="16 18 22 12 16 6" />
-      <polyline points="8 6 2 12 8 18" />
-    </svg>
-  );
-}
-
-function XIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
   );
 }
