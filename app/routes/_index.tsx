@@ -40,13 +40,19 @@ export default function Component() {
             Skills
           </Link>
           <Link
-            to="#"
+            to="#experience"
             className="text-sm font-medium hover:underline underline-offset-4"
           >
             Experience
           </Link>
           <Link
-            to="#"
+            to="#expertise"
+            className="text-sm font-medium hover:underline underline-offset-4"
+          >
+            Expertise
+          </Link>
+          <Link
+            to="#contact"
             className="text-sm font-medium hover:underline underline-offset-4"
           >
             Contact
@@ -248,6 +254,129 @@ export default function Component() {
           </div>
         </section>
         <section
+          id="expertise"
+          className="border-t bg-background py-12 md:py-16 lg:py-20"
+        >
+          <div className="container px-4 md:px-6">
+            <div className="max-w-3xl mx-auto text-center space-y-4">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                My Expertise
+              </h2>
+              <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                I have years of experience in a wide range of technologies.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
+                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Languages</h3>
+                </div>
+                <div className="grid gap-2 mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      JavaScript - 7 Years
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      TypeScript - 3 Years
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
+                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Frameworks</h3>
+                </div>
+                <div className="grid gap-2 mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">React - 5 Years</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">Next.js - 2 Years</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      Tailwind CSS - 2 Years
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
+                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Backends</h3>
+                </div>
+                <div className="grid gap-2 mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">Node.js - 4 Years</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
+                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Libraries</h3>
+                </div>
+                <div className="grid gap-2 mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">React - 5 Years</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
+                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Tools</h3>
+                </div>
+                <div className="grid gap-2 mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary rounded-md p-2 flex items-center justify-center">
+                      <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      Tailwind CSS - 2 Years
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
           id="contact"
           className="w-full py-12 md:py-24 lg:py-32 bg-muted"
         >
@@ -361,6 +490,26 @@ function MoveIcon(props) {
       <polyline points="19 9 22 12 19 15" />
       <line x1="2" x2="22" y1="12" y2="12" />
       <line x1="12" x2="12" y1="2" y2="22" />
+    </svg>
+  );
+}
+
+function CodeIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
     </svg>
   );
 }
