@@ -27,30 +27,41 @@
     --font-heading: 'IBM Plex Mono', monospace;
     --font-body: 'IBM Plex Mono', monospace;
   }
+
+  .dark,
+  :root[class~="dark"] {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 85%;
+    --primary: 0 0% 20%;
+    --primary-foreground: 0 0% 85%;
+    --secondary: 0 0% 30%;
+    --secondary-foreground: 0 0% 85%;
+    --accent: 240 100% 50%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84% 32%;
+    /* Keeping this the same for visibility */
+    --destructive-foreground: 0 0% 10%;
+    --muted: 0 0% 25%;
+    --muted-foreground: 0 0% 85%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 85%;
+    --popover: 0 0% 20%;
+    --popover-foreground: 240 10% 96.1%;
+    --border: 0 0% 40%;
+    --input: 0 0% 40%;
+    --ring: 0 0% 85%;
+    --font-heading: 'IBM Plex Mono', monospace;
+    --font-body: 'IBM Plex Mono', monospace;
+  }
 }
 
-/* TODO: DARKMODE */
-/* --background: 0 0% 85%; */
-/* --foreground: 0 0% 10%; */
-/* --primary: 0 0% 80%; */
-/* --primary-foreground: 0 0% 10%; */
-/* --secondary: 0 0% 70%; */
-/* --secondary-foreground: 0 0% 10%; */
-/* --accent: 240 100% 50%; */
-/* --accent-foreground: 0 0% 100%; */
-/* --destructive: 0 84% 32%; */
-/* --destructive-foreground: 0 0% 98%; */
-/* --muted: 0 0% 75%; */
-/* --muted-foreground: 0 0% 10%; */
-/* --card: 0 0% 95%; */
-/* --card-foreground: 0 0% 10%; */
-/* --popover: 0 0% 100%; */
-/* --popover-foreground: 240 10% 3.9%; */
-/* --border: 0 0% 60%; */
-/* --input: 0 0% 60%; */
-/* --ring: 0 0% 10%; */
+
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     @apply border-border;
   }

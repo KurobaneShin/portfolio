@@ -8,6 +8,7 @@ export const meta: MetaFunction = () => {
 };
 
 import { Link } from "@remix-run/react";
+import { ModeToggle } from "~/components/custom/ModeToggle";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
@@ -20,7 +21,8 @@ export default function Component() {
           <LaptopIcon className="h-6 w-6" />
           <span className="sr-only">Kurobane</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+          <ModeToggle />
           <Link
             to="#"
             className="text-sm font-medium hover:underline underline-offset-4"
