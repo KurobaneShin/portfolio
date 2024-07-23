@@ -33,9 +33,9 @@ export default {
       "I have worked with a variety of companies and clients, delivering high-quality software solutions.",
   },
   skills: {
-    title: "Minhas Hábilidades",
+    title: "Skills",
     description:
-      "Eu possuo expertise em uma variedade de tecnologias, incluindo React, Node.js e Go.",
+      "I have expertise in a variety of technologies, including React, Node.js and Go.",
     react:
       "Proficient in building modern, responsive web applications using React.",
     node:

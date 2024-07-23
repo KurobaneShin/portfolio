@@ -352,9 +352,9 @@ export default function Index() {
         </nav>
       </header>
       <main className="flex-1">
-        <section id="hero" className="w-full pt-12 md:pt-24 lg:pt-32 border-b">
+        <section id="hero" className="w-full pt-6 md:py-12 lg:py-16 border-b">
           <div className="container px-4 md:px-6 space-y-10 xl:space-y-16">
-            <div className="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:gap-16">
+            <div className="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:items-center md:gap-16">
               <div>
                 <h1 className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
                   {t("title")}
@@ -403,7 +403,10 @@ export default function Index() {
             </div>
             <div className="mx-auto grid items-stretch gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               {projects.map((p) => (
-                <div
+                <Link
+                  to={p.link}
+                  target="_blank"
+                  rel="noreferrer"
                   key={p.id}
                   className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
@@ -418,7 +421,7 @@ export default function Index() {
                   <p className="text-sm text-muted-foreground">
                     {p.description}
                   </p>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
