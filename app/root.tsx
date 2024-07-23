@@ -6,7 +6,6 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useRouteLoaderData,
 } from "@remix-run/react";
 import { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -22,6 +21,11 @@ import i18nServer, { localeCookie } from "./modules/i18n.server";
 import { useChangeLanguage } from "remix-i18next/react";
 
 export const links: LinksFunction = () => [
+  {
+    rel: "icon",
+    href: "/favicon.jpeg",
+    type: "image/png",
+  },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com" },
   {

@@ -12,37 +12,39 @@ import {
   DropdownMenuSeparator,
 } from "@radix-ui/react-dropdown-menu";
 import { Form } from "@remix-run/react";
+import { useTranslation } from "react-i18next";
 
 export const LangChooser = () => {
+  const { t } = useTranslation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <GlobeIcon className="h-5 w-5 text-muted-foreground" />
-          <span className="sr-only">Select language</span>
+          <span className="sr-only">{t("langChooser.title")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         <Form>
-          <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("langChooser.title")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <button
                 name="lng"
                 value="en"
-                className="flex w-full items-center justify-between"
+                className="cursor-pointer flex w-full items-center justify-between"
               >
-                English
+                {t("langChooser.english")}
               </button>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <button
                 name="lng"
                 value="ptBR"
-                className="flex w-full items-center justify-between"
+                className="cursor-pointer flex w-full items-center justify-between"
               >
-                Português
+                {t("langChooser.portuguese")}
               </button>
             </DropdownMenuItem>
           </DropdownMenuGroup>
