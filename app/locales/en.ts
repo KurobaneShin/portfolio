@@ -52,7 +52,7 @@ export default {
     description: "I have years of experience in a wide range of technologies.",
   },
   languages: {
-    title: "Linguagens",
+    title: "Languages",
     go: { name: "Go", experience: "4 Years" },
     js: { name: "Javascript", experience: "4 Years" },
     ts: { name: "Typescript", experience: "3 Years" },
@@ -79,18 +79,18 @@ export default {
     gorm: { name: "gorm", experience: "1 Year" },
   },
   tools: {
-    title: "Ferramentas",
+    title: "Tools",
     tailwind: { name: "tailwind css", experience: "2 Years" },
     node: { name: "node.js", experience: "4 Years" },
     docker: { name: "docker", experience: "3 Years" },
     k8: { name: "kubernetes", experience: "1 Year" },
   },
   databases: {
-    title: "Bancos de dados",
+    title: "Databases",
     pg: { name: "postgres", experience: "4 Years" },
-    mongo: { name: "mongodb", experience: "1 ano" },
-    redis: { name: "redis", experience: "3 anos" },
-    mysql: { name: "mysql", experience: "4 anos" },
+    mongo: { name: "mongodb", experience: "1 Year" },
+    redis: { name: "redis", experience: "3 Years" },
+    mysql: { name: "mysql", experience: "4 Years" },
   },
   touch: {
     title: "Get in Touch",
