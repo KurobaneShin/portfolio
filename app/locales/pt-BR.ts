@@ -99,4 +99,8 @@ export default {
       submit: "Enviar",
     },
   },
+  validations: {
+    required: "Obrigatório",
+    email: "Email inválido",
+  },
 };

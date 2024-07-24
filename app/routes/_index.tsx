@@ -1,19 +1,24 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    { title: "Kurobane" },
-    { name: "description", content: data?.description },
-  ];
-};
-
-import { json, Link, useLoaderData } from "@remix-run/react";
+import { parseWithZod } from "@conform-to/zod";
+import {
+  Form,
+  json,
+  Link,
+  useActionData,
+  useLoaderData,
+} from "@remix-run/react";
 import {
   CodeIcon,
   CodepenIcon,
   Laptop2Icon,
   MenuIcon,
   MoveIcon,
+  XIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LangChooser } from "~/components/custom/LangChooser";
@@ -28,6 +33,22 @@ import {
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import i18nServer from "~/modules/i18n.server";
+import { resend } from "~/modules/resend.server";
+import { z } from "zod";
+import { useForm } from "@conform-to/react";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    { title: "Kurobane" },
+    { name: "description", content: data?.description },
+  ];
+};
+
+const contactSchema = z.object({
+  email: z.string({ message: "required" }).email({ message: "email" }),
+  message: z.string({ message: "required" }),
+  name: z.string({ message: "required" }),
+});
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const t = await i18nServer.getFixedT(request);
@@ -271,9 +292,61 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const submission = parseWithZod(formData, { schema: contactSchema });
+
+  if (submission.status !== "success") {
+    return json(submission.reply());
+  }
+
+  const { name, email, message } = submission.value;
+
+  const from = "kurobane@peropero.site";
+  const to = process.env.NODE_ENV !== "production"
+    ? "delivered@resend.dev"
+    : "icarofdiniz@gmail.com";
+
+  const { error } = await resend.emails.send({
+    from,
+    to: [
+      to,
+    ],
+    subject: "hire",
+    html: `
+    <div>
+      <h1>Hi, my name is ${name}</h1>
+      <p>Email: ${email}</p>
+      <p>${message}</p>
+    </div>
+    `,
+  });
+
+  if (error) {
+    console.log("error", error);
+    return submission.reply({
+      fieldErrors: {
+        email: ["error"],
+      },
+    });
+  }
+
+  return {};
+};
+
 export default function Index() {
   const { t } = useTranslation();
   const { projects, companies } = useLoaderData<typeof loader>();
+
+  const lastResult = useActionData<typeof action>();
+  const [form, fields] = useForm({
+    lastResult,
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: contactSchema });
+    },
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+  });
 
   const langs = ["go", "js", "ts", "php"];
   const frontends = ["react", "rn", "vue"];
@@ -677,20 +750,65 @@ export default function Index() {
                 </p>
               </div>
               <div className="mx-auto w-full max-w-sm space-y-2">
-                <form className="flex flex-col gap-2">
+                <Form
+                  method="post"
+                  id={form.id}
+                  onSubmit={form.onSubmit}
+                  noValidate
+                  className="flex flex-col gap-2"
+                >
                   <Input
                     type="text"
                     placeholder={t("touch.inputs.name")}
                     className="max-w-lg flex-1"
+                    key={fields.name.key}
+                    name={fields.name.name}
+                    defaultValue={fields.name.initialValue}
                   />
+                  {fields.name.errors?.map((e) => (
+                    <div
+                      className="self-start text-red-500 text-sm flex items-center"
+                      key={e}
+                    >
+                      <XIcon />
+                      <p>{t(`validations.${e}`)}</p>
+                    </div>
+                  ))}
                   <Input
                     type="email"
                     placeholder={t("touch.inputs.email")}
                     className="max-w-lg flex-1"
+                    key={fields.email.key}
+                    name={fields.email.name}
+                    defaultValue={fields.email.initialValue}
                   />
-                  <Textarea placeholder="Message" className="max-w-lg flex-1" />
+                  {fields.email.errors?.map((e) => (
+                    <div
+                      className="self-start text-red-500 text-sm flex items-center"
+                      key={e}
+                    >
+                      <XIcon />
+                      <p>{t(`validations.${e}`)}</p>
+                    </div>
+                  ))}
+                  <Textarea
+                    placeholder={t("touch.inputs.message")}
+                    className="max-w-lg flex-1"
+                    key={fields.message.key}
+                    name={fields.message.name}
+                    defaultValue={fields.message.initialValue}
+                  />
+                  {fields.message.errors?.map((e) => (
+                    <div
+                      className="self-start text-red-500 text-sm flex items-center"
+                      key={e}
+                    >
+                      <XIcon />
+                      <p>{t(`validations.${e}`)}</p>
+                    </div>
+                  ))}
                   <Button type="submit">{t("touch.inputs.submit")}</Button>
-                </form>
+                </Form>
               </div>
             </div>
           </div>

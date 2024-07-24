@@ -72,7 +72,7 @@ export default {
     gofiber: { name: "go-fiber", experience: "2 Years" },
   },
   libraries: {
-    title: "Bibliotecas",
+    title: "Libraries",
     prisma: { name: "prisma", experience: "3 Years" },
     typeorm: { name: "typeorm", experience: "3 Years" },
     trpc: { name: "trpc", experience: "2 Years" },
@@ -102,5 +102,9 @@ export default {
       message: "Message",
       submit: "Submit",
     },
+  },
+  validations: {
+    required: "Required",
+    email: "Invalid email",
   },
 };
