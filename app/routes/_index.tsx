@@ -42,6 +42,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) =>
   getMeta({
     title: "Kurobane (Icaro)",
     description: data?.description,
+    canonical: "https://portfolio-kurobanes-projects.vercel.app",
     openGraph: {
       type: "website",
       siteName: "Kurobane (Icaro)",
