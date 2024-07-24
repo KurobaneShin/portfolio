@@ -36,13 +36,20 @@ import i18nServer from "~/modules/i18n.server";
 import { resend } from "~/modules/resend.server";
 import { z } from "zod";
 import { useForm } from "@conform-to/react";
+import { getMeta } from "~/modules/seo";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    { title: "Kurobane" },
-    { name: "description", content: data?.description },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = ({ data }) =>
+  getMeta({
+    title: "Kurobane (Icaro)",
+    description: data?.description,
+    openGraph: {
+      type: "website",
+      siteName: "Kurobane (Icaro)",
+      images: [{
+        url: "https://github.com/kurobaneshin.png",
+      }],
+    },
+  });
 
 const contactSchema = z.object({
   email: z.string({ message: "required" }).email({ message: "email" }),
