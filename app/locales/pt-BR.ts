@@ -27,6 +27,11 @@ export default {
     description:
       "Confira alguns dos meus projetos mais recentes, que demonstram minhas habilidades em React, Node.js e Go.",
   },
+  exp: {
+    title: "Experiência",
+    description:
+      "Trabalhei com uma variedade de empresas e clientes, entregando soluções de software de alta qualidade.",
+  },
   skills: {
     title: "Minhas Habilidades",
     description:
