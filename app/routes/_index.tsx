@@ -82,23 +82,40 @@ export const headers: HeadersFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const t = await i18nServer.getFixedT(request);
-  const locale = await i18nServer.getLocale(request);
-  const projectsQuery = supabase.from("projects")
-    .select("*").eq("lang", locale).then((res) => res.error ? [] : res.data);
+  const [t, locale] = await Promise.all([
+    i18nServer.getFixedT(request),
+    i18nServer.getLocale(request),
+  ]);
 
-  const companiesQuery = supabase.from("companies").select("*").eq(
-    "lang",
-    locale,
-  ).order("end", {
-    nullsFirst: true,
-    ascending: false,
-  }).then((res) => res.error ? [] : res.data);
+  const projectsQuery = async () => {
+    const res = await supabase.from("projects")
+      .select("*").eq("lang", locale);
+
+    if (res.error) {
+      throw new Error(res.error.message);
+    }
+    return res.data;
+  };
+
+  const companiesQuery = async () => {
+    const res = await supabase.from("companies").select("*").eq(
+      "lang",
+      locale,
+    ).order("end", {
+      nullsFirst: true,
+      ascending: false,
+    });
+
+    if (res.error) {
+      throw new Error(res.error.message);
+    }
+    return res.data;
+  };
 
   return defer({
     description: t("description"),
-    projectsQuery,
-    companiesQuery,
+    projectsQuery: projectsQuery(),
+    companiesQuery: companiesQuery(),
   });
 }
 
