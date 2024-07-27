@@ -1,5 +1,6 @@
 import type {
   ActionFunctionArgs,
+  HeadersFunction,
   LinksFunction,
   LoaderFunctionArgs,
   MetaFunction,
@@ -71,6 +72,14 @@ const contactSchema = z.object({
   message: z.string({ message: "required" }),
   name: z.string({ message: "required" }),
 });
+
+export const headers: HeadersFunction = () => {
+  return {
+    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
+    "CDN-Cache-Control": "public, s-maxage=60",
+    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
+  };
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const t = await i18nServer.getFixedT(request);

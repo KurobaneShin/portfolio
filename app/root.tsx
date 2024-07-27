@@ -51,9 +51,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
       theme: getTheme() ?? "light",
       locale,
     },
-    { headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
+    {
+      headers: {
+        "Set-Cookie": await localeCookie.serialize(locale),
+        "Cache-Control": "public, s-maxage=1",
+        "CDN-Cache-Control": "public, s-maxage=60",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
+      },
+    },
   );
 }
+// All routes will inherit this configuration,
+// unless a route overrides the config option
+export const config = {
+  memory: 1024,
+};
 
 export function App() {
   const data = useLoaderData<typeof loader>();
