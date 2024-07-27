@@ -1,11 +1,14 @@
 import type {
   ActionFunctionArgs,
+  LinksFunction,
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
 
 import { parseWithZod } from "@conform-to/zod";
 import {
+  Await,
+  defer,
   Form,
   json,
   Link,
@@ -37,6 +40,17 @@ import { resend } from "~/modules/resend.server";
 import { z } from "zod";
 import { useForm } from "@conform-to/react";
 import { getMeta } from "~/modules/seo";
+import { supabase } from "~/modules/supabase.server";
+import { Suspense } from "react";
+
+export const links: LinksFunction = () => [
+  { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
+  {
+    rel: "preload",
+    href: "https://avatars.githubusercontent.com/u/47834261?v=4",
+    as: "image",
+  },
+];
 
 export const meta: MetaFunction<typeof loader> = ({ data }) =>
   getMeta({
@@ -61,242 +75,21 @@ const contactSchema = z.object({
 export async function loader({ request }: LoaderFunctionArgs) {
   const t = await i18nServer.getFixedT(request);
   const locale = await i18nServer.getLocale(request);
+  const projectsQuery = supabase.from("projects")
+    .select("*").eq("lang", locale).then((res) => res.error ? [] : res.data);
 
-  const projects = [
-    {
-      id: "1",
-      title: "Porfolio",
-      description:
-        "A React-based web application with Node.js backend using Remix.js.",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/portfolio",
-    },
-    {
-      id: "2",
-      title: "Toller",
-      picture: "/github-placeholder.png",
-      description: "A Go-based microservice with kafka",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/toller",
-    },
-    {
-      id: "3",
-      title: "Blockchain",
-      description: "A descentralized blockchain built with Go",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/blockchain",
-    },
-    {
-      id: "4",
-      title: "Crypto Exchange",
-      description: "A crypto exchange of ETH network built with Go",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/crypto-exchange",
-    },
-    {
-      id: "5",
-      title: "Webhooker",
-      description: "A ssh server that listen to webhooks built with Go",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/webhooker",
-    },
-    {
-      id: "6",
-      title: "DFS",
-      description: "A clone of HadoopDFS built with go",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/distributed-file-storage",
-    },
-    {
-      id: "7",
-      title: "Redis Clone",
-      description: "A clone of Redis that accepts RESP built with go",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/go-redis",
-    },
-    {
-      id: "8",
-      title: "Peropero",
-      description:
-        "A online manga reader built with Node.js backend using Remix.js.",
-      picture: "/github-placeholder.png",
-      lang: "en",
-      link: "https://github.com/KurobaneShin/peropero",
-    },
-    {
-      id: "1",
-      title: "Portfólio",
-      description:
-        "Uma aplicação web baseada em React com backend em Node.js usando Remix.js.",
-      picture: "https://github.com/kurobaneshin.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/portfolio",
-    },
-    {
-      id: "2",
-      title: "Toller",
-      description: "Um microsserviço baseado em Go com Kafka",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/toller",
-    },
-    {
-      id: "3",
-      title: "Blockchain",
-      description: "Uma blockchain descentralizada construída com Go",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/blockchain",
-    },
-    {
-      id: "4",
-      title: "Crypto Exchange",
-      description: "Uma exchange de criptomoedas da rede ETH construída com Go",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/crypto-exchange",
-    },
-    {
-      id: "5",
-      title: "Webhooker",
-      description: "Um servidor SSH que escuta webhooks construído com Go",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/webhooker",
-    },
-    {
-      id: "6",
-      title: "DFS",
-      description: "Um clone do HadoopDFS construído com Go",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/distributed-file-storage",
-    },
-    {
-      id: "7",
-      title: "Redis Clone",
-      description: "Um clone do Redis que aceita RESP, construído com Go",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/go-redis",
-    },
-    {
-      id: "8",
-      title: "Peropero",
-      description:
-        "Um leitor de mangás online construído com backend em Node.js usando Remix.js.",
-      picture: "/github-placeholder.png",
-      lang: "ptBR",
-      link: "https://github.com/KurobaneShin/peropero",
-    },
-  ];
+  const companiesQuery = supabase.from("companies").select("*").eq(
+    "lang",
+    locale,
+  ).order("end", {
+    nullsFirst: true,
+    ascending: false,
+  }).then((res) => res.error ? [] : res.data);
 
-  const companies = [
-    {
-      id: "1",
-      title: "Software engineer",
-      client: "Quaddro",
-      start: "14/08/2022",
-      lang: "en",
-      end: null,
-      items: [
-        "Developed and maintained a tree React-based web application with a Node.js backend.",
-        "Implemented a microservice using Go and Docker.",
-        "Collaborated with cross-functional teams to deliver high-quality software solutions.",
-        "Automated WhatsApp messaging using Golang",
-        "Leveraged Google Cloud Platform (GCP) for deploying and managing applications",
-        "Implemented responsive UI designs with TailwindCSS",
-      ],
-    },
-    {
-      id: "2",
-      title: "Software developer",
-      client: "Evocorp",
-      start: "03/02/2022",
-      end: "10/08/2022",
-      lang: "en",
-      items: [
-        "Designed and implemented a comprehensive backoffice system for a credit card management platform using React with TypeScript and React Query",
-        "Developed a secure and scalable system",
-        "Focused on functionalities such as user account management and transaction processing",
-      ],
-    },
-    {
-      id: "3",
-      title: "Software developer",
-      client: "Brisanet",
-      start: "02/02/2021",
-      end: "02/03/2022",
-      lang: "en",
-      items: [
-        "Maintained and enhanced a Laravel-based backoffice system",
-        "Ensured seamless integration with React Native applications",
-        "Created robust APIs to support mobile app functionalities",
-        "Developed synchronization mechanisms for data consistency across local databases and the server",
-      ],
-    },
-    {
-      id: "4",
-      title: "Engenheiro de Software",
-      client: "Quaddro",
-      start: "14/08/2022",
-      lang: "ptBR",
-      end: null,
-      items: [
-        "Mantive e aprimorou um sistema de backoffice baseado em Laravel",
-        "Garanti integração perfeita com aplicações React Native",
-        "Criei APIs robustas para suportar funcionalidades de aplicativos móveis",
-        "Desenvolvi mecanismos de sincronização para consistência de dados entre bancos de dados locais e o servidor",
-      ],
-    },
-    {
-      id: "5",
-      title: "Desenvolvedor Software",
-      client: "Evocorp",
-      start: "03/02/2022",
-      end: "10/08/2022",
-      lang: "ptBR",
-      items: [
-        "Desenhei e implementei um sistema de backoffice abrangente para uma plataforma de gerenciamento de cartões de crédito usando React com TypeScript e React Query",
-        "Desenvolvi um sistema seguro e escalável",
-        "Foquei em funcionalidades como gerenciamento de contas de usuário e processamento de transações",
-      ],
-    },
-    {
-      id: "6",
-      title: "Desenvolvedor de Software",
-      client: "Brisanet",
-      start: "02/02/2021",
-      end: "02/03/2022",
-      lang: "ptBR",
-      items: [
-        "Mantive e aprimorou um sistema de backoffice baseado em Laravel",
-        "Garanti integração perfeita com aplicações React Native",
-        "Criei APIs robustas para suportar funcionalidades de aplicativos móveis",
-        "Desenvolvi mecanismos de sincronização para consistência de dados entre bancos de dados locais e o servidor",
-      ],
-    },
-  ];
-
-  return json({
+  return defer({
     description: t("description"),
-    projects: projects.filter((p) => p.lang === locale),
-    companies: companies.filter((p) => p.lang === locale).sort((a, b) => {
-      // If a is null, it should come first
-      if (a.end === null) return -1;
-      // If b is null, it should come first
-      if (b.end === null) return 1;
-
-      // Otherwise, compare the dates
-      return new Date(b.end).getMilliseconds() -
-        new Date(a.end).getMilliseconds();
-    }),
+    projectsQuery,
+    companiesQuery,
   });
 }
 
@@ -344,7 +137,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Index() {
   const { t } = useTranslation();
-  const { projects, companies } = useLoaderData<typeof loader>();
+  const { projectsQuery, companiesQuery } = useLoaderData<typeof loader>();
 
   const lastResult = useActionData<typeof action>();
   const [form, fields] = useForm({
@@ -362,6 +155,7 @@ export default function Index() {
   const libraries = ["prisma", "typeorm", "trpc", "gorm"];
   const tools = ["tailwind", "node", "docker", "k8"];
   const databases = ["pg", "mongo", "redis", "mysql"];
+
   const navItens = [
     {
       link: "#hero",
@@ -483,27 +277,32 @@ export default function Index() {
               </div>
             </div>
             <div className="mx-auto grid items-stretch gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
-              {projects.map((p) => (
-                <Link
-                  to={p.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  key={p.id}
-                  className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <img
-                    src={p.picture}
-                    width={300}
-                    height={200}
-                    alt={p.title}
-                    className="rounded-lg object-cover"
-                  />
-                  <h3 className="text-lg font-bold">{p.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {p.description}
-                  </p>
-                </Link>
-              ))}
+              <Suspense fallback={<div>Loading...</div>}>
+                <Await resolve={projectsQuery}>
+                  {(projects) =>
+                    projects.map((p) => (
+                      <Link
+                        to={p.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        key={p.id}
+                        className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <img
+                          src={p.picture}
+                          width={300}
+                          height={200}
+                          alt={p.title}
+                          className="rounded-lg object-cover"
+                        />
+                        <h3 className="text-lg font-bold">{p.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {p.description}
+                        </p>
+                      </Link>
+                    ))}
+                </Await>
+              </Suspense>
             </div>
           </div>
         </section>
@@ -574,20 +373,25 @@ export default function Index() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              {companies.map((c) => (
-                <div
-                  key={c.id}
-                  className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <h3 className="text-lg font-bold">{c.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {c.client} | {c.start} - {c.end ?? "Present"}
-                  </p>
-                  <ul className="list-disc pl-4 text-sm text-muted-foreground">
-                    {c.items.map((i, idx) => <li key={idx}>{i}</li>)}
-                  </ul>
-                </div>
-              ))}
+              <Suspense fallback={<div>Loading...</div>}>
+                <Await resolve={companiesQuery} errorElement={<div>Error</div>}>
+                  {(companies) =>
+                    companies.map((c) => (
+                      <div
+                        key={c.id}
+                        className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <h3 className="text-lg font-bold">{c.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {c.client} | {c.start} - {c.end ?? "Present"}
+                        </p>
+                        <ul className="list-disc pl-4 text-sm text-muted-foreground">
+                          {c.items.map((i, idx) => <li key={idx}>{i}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                </Await>
+              </Suspense>
             </div>
           </div>
         </section>
@@ -768,6 +572,7 @@ export default function Index() {
                   <Input
                     type="text"
                     placeholder={t("touch.inputs.name")}
+                    autoComplete="name"
                     className="max-w-lg flex-1"
                     key={fields.name.key}
                     name={fields.name.name}
@@ -784,6 +589,7 @@ export default function Index() {
                   ))}
                   <Input
                     type="email"
+                    autoComplete="email"
                     placeholder={t("touch.inputs.email")}
                     className="max-w-lg flex-1"
                     key={fields.email.key}

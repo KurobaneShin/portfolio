@@ -4,6 +4,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { vercelPreset } from "@vercel/remix/vite";
 
 export default defineConfig({
+  build: {
+    minify: "esbuild",
+  },
   plugins: [
     remix({
       presets: [vercelPreset()],

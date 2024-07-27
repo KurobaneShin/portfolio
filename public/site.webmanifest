@@ -1,13 +1,12 @@
-
 {
   "name": "Kurobane",
   "short_name": "Kurobane",
   "icons": [
     {
-      "src": "/favicon",
+      "src": "/favicon.jpeg",
       "type": "image/jpeg",
       "sizes": "192x192"
-    },
+    }
   ],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
