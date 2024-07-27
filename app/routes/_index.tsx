@@ -3,7 +3,7 @@ import type {
   LinksFunction,
   LoaderFunctionArgs,
   MetaFunction,
-} from "@remix-run/node";
+} from "@vercel/remix";
 
 import { parseWithZod } from "@conform-to/zod";
 import {

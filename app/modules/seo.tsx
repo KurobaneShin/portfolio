@@ -1,4 +1,4 @@
-import { LoaderFunction, MetaArgs, MetaDescriptor } from "@remix-run/node";
+import { LoaderFunction, MetaArgs, MetaDescriptor } from "@vercel/remix";
 
 // inspo by https://github.com/chaance/remix-seo/blob/main/src/index.ts
 export interface DefaultMeta<

@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { LinksFunction, LoaderFunctionArgs } from "@vercel/remix";
 import {
   PreventFlashOnWrongTheme,
   ThemeProvider,
