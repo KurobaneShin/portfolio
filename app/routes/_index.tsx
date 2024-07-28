@@ -43,6 +43,8 @@ import { useForm } from "@conform-to/react";
 import { getMeta } from "~/modules/seo";
 import { supabase } from "~/modules/supabase.server";
 import { Suspense } from "react";
+import { toaster } from "~/modules/toast.server";
+import { jsonWithError, jsonWithSuccess } from "remix-toast";
 
 export const links: LinksFunction = () => [
   { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
@@ -150,15 +152,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   });
 
   if (error) {
-    console.log("error", error);
-    return submission.reply({
-      fieldErrors: {
-        email: ["error"],
-      },
-    });
+    console.error("resend", error);
+    return jsonWithError(
+      {},
+      { message: "Email not sent", description: "try again later" },
+    );
   }
 
-  return {};
+  return jsonWithSuccess(
+    {},
+    { message: "Email sent", description: "tank you for contacting me" },
+  );
 };
 
 export default function Index() {

@@ -19,6 +19,10 @@ import { themeSessionResolver } from "./sessions";
 import "./tailwind.css";
 import i18nServer, { localeCookie } from "./modules/i18n.server";
 import { useChangeLanguage } from "remix-i18next/react";
+import { useEffect } from "react";
+import { Toaster } from "./components/ui/sonner";
+import { toast } from "sonner";
+import { getToast } from "remix-toast";
 
 export const links: LinksFunction = () => [
   {
@@ -45,19 +49,21 @@ export const handle = { i18n: ["translation"] };
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   const locale = await i18nServer.getLocale(request);
+  const { toast, headers } = await getToast(request);
+
+  headers.append("Set-Cookie", await localeCookie.serialize(locale));
+  headers.append("Cache-Control", "public, s-maxage=1");
+  headers.append("CDN-Cache-Control", "public, s-maxage=60");
+  headers.append("Vercel-CDN-Cache-Control", "public, s-maxage=3600");
 
   return json(
     {
       theme: getTheme() ?? "light",
       locale,
+      toast,
     },
     {
-      headers: {
-        "Set-Cookie": await localeCookie.serialize(locale),
-        "Cache-Control": "public, s-maxage=1",
-        "CDN-Cache-Control": "public, s-maxage=60",
-        "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
-      },
+      headers,
     },
   );
 }
@@ -70,6 +76,15 @@ export const config = {
 export function App() {
   const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
+
+  useEffect(() => {
+    if (data.toast) {
+      toast(data.toast.message, {
+        description: data.toast.description,
+      });
+    }
+  }, [data.toast]);
+
   return (
     <html lang={data.locale ?? "en"} className={clsx(theme)}>
       <head>
@@ -81,6 +96,7 @@ export function App() {
       </head>
       <body>
         <Outlet />
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
