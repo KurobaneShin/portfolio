@@ -43,7 +43,6 @@ import { useForm } from "@conform-to/react";
 import { getMeta } from "~/modules/seo";
 import { supabase } from "~/modules/supabase.server";
 import { Suspense } from "react";
-import { toaster } from "~/modules/toast.server";
 import { jsonWithError, jsonWithSuccess } from "remix-toast";
 
 export const links: LinksFunction = () => [
