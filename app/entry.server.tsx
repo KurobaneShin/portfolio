@@ -5,6 +5,10 @@ import * as i18n from "./config/i18n";
 
 import { RemixServer } from "@remix-run/react";
 import { type EntryContext, handleRequest } from "@vercel/remix";
+import { getEnv, init } from "./env.server";
+
+init();
+global.ENV = getEnv();
 
 export default async function (
   request: Request,

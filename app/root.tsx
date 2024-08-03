@@ -23,6 +23,7 @@ import { useEffect } from "react";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 import { getToast } from "remix-toast";
+import { getEnv } from "./env.server";
 
 export const links: LinksFunction = () => [
   {
@@ -61,6 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       theme: getTheme() ?? "light",
       locale,
       toast,
+      ENV: getEnv(),
     },
     {
       headers,
@@ -97,6 +99,11 @@ export function App() {
       <body>
         <Outlet />
         <Toaster />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+          }}
+        />
         <ScrollRestoration />
         <Scripts />
       </body>
