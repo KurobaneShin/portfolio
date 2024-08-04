@@ -42,8 +42,9 @@ import { z } from "zod";
 import { useForm } from "@conform-to/react";
 import { getMeta } from "~/modules/seo";
 import { supabase } from "~/modules/supabase.server";
-import { Suspense } from "react";
 import { jsonWithError, jsonWithSuccess } from "remix-toast";
+import { cachified } from "~/modules/cache.server";
+import { Suspense } from "react";
 
 export const links: LinksFunction = () => [
   { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
@@ -89,28 +90,42 @@ export async function loader({ request }: LoaderFunctionArgs) {
   ]);
 
   const projectsQuery = async () => {
-    const res = await supabase.from("projects")
-      .select("*").eq("lang", locale);
+    const data = await cachified({
+      key: `projects-${locale}`,
+      ttl: 1000 * 60 * 60 * 24,
+      async getFreshValue() {
+        const res = await supabase.from("projects")
+          .select("*").eq("lang", locale);
 
-    if (res.error) {
-      throw new Error(res.error.message);
-    }
-    return res.data;
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
+        return res.data;
+      },
+    });
+    return data;
   };
 
   const companiesQuery = async () => {
-    const res = await supabase.from("companies").select("*").eq(
-      "lang",
-      locale,
-    ).order("end", {
-      nullsFirst: true,
-      ascending: false,
-    });
+    const data = await cachified({
+      key: `companies-${locale}`,
+      ttl: 1000 * 60 * 60 * 24,
+      async getFreshValue() {
+        const res = await supabase.from("companies").select("*").eq(
+          "lang",
+          locale,
+        ).order("end", {
+          nullsFirst: true,
+          ascending: false,
+        });
 
-    if (res.error) {
-      throw new Error(res.error.message);
-    }
-    return res.data;
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
+        return res.data;
+      },
+    });
+    return data;
   };
 
   return defer({
@@ -402,7 +417,10 @@ export default function Index() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense
+                key="companies"
+                fallback={<div>Loading...</div>}
+              >
                 <Await resolve={companiesQuery} errorElement={<div>Error</div>}>
                   {(companies) =>
                     companies.map((c) => (
