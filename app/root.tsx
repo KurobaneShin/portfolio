@@ -16,7 +16,7 @@ import {
 import clsx from "clsx";
 import { themeSessionResolver } from "./sessions";
 
-import "./tailwind.css";
+import stylesHref from "./tailwind.css?url";
 import i18nServer, { localeCookie } from "./modules/i18n.server";
 import { useChangeLanguage } from "remix-i18next/react";
 import { useEffect } from "react";
@@ -26,6 +26,7 @@ import { getToast } from "remix-toast";
 import { getEnv } from "./env.server";
 
 export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: stylesHref },
   {
     rel: "icon",
     href: "/favicon.jpeg",

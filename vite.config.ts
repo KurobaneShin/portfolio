@@ -2,6 +2,11 @@ import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { vercelPreset } from "@vercel/remix/vite";
+import babel from "vite-plugin-babel";
+
+const ReactCompilerConfig = {
+  compilationMode: "annotation",
+};
 
 export default defineConfig({
   build: {
@@ -17,5 +22,14 @@ export default defineConfig({
       },
     }),
     tsconfigPaths(),
+    babel({
+      filter: /\.[jt]sx?$/,
+      babelConfig: {
+        presets: ["@babel/preset-typescript"], // if you use TypeScript
+        plugins: [
+          ["babel-plugin-react-compiler", ReactCompilerConfig],
+        ],
+      },
+    }),
   ],
 });
