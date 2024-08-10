@@ -9,7 +9,7 @@
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["@vercel/remix", "vite/client"],
+    "types": ["@vercel/remix", "vite/client","@remix-run/react/future/single-fetch.d.ts"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",

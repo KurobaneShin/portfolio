@@ -1,15 +1,14 @@
-import type {
-  ActionFunctionArgs,
+import {
   HeadersFunction,
   LinksFunction,
-  LoaderFunctionArgs,
   MetaFunction,
+  unstable_defineAction as defineAction,
+  unstable_defineLoader as defineLoader,
 } from "@vercel/remix";
 
 import { parseWithZod } from "@conform-to/zod";
 import {
   Await,
-  defer,
   Form,
   json,
   Link,
@@ -83,7 +82,7 @@ export const headers: HeadersFunction = () => {
   };
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export const loader = defineLoader(async ({ request }) => {
   const [t, locale] = await Promise.all([
     i18nServer.getFixedT(request),
     i18nServer.getLocale(request),
@@ -128,14 +127,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return data;
   };
 
-  return defer({
+  return {
     description: t("description"),
     projectsQuery: projectsQuery(),
     companiesQuery: companiesQuery(),
-  });
-}
+  };
+});
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request }) => {
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: contactSchema });
 
@@ -177,7 +176,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     {},
     { message: "Email sent", description: "tank you for contacting me" },
   );
-};
+});
 
 export default function Index() {
   const { t } = useTranslation();

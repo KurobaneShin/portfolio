@@ -1,4 +1,8 @@
 import {
+  LinksFunction,
+  unstable_defineLoader as defineLoader,
+} from "@vercel/remix";
+import {
   json,
   Links,
   Meta,
@@ -7,7 +11,6 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { LinksFunction, LoaderFunctionArgs } from "@vercel/remix";
 import {
   PreventFlashOnWrongTheme,
   ThemeProvider,
@@ -48,7 +51,7 @@ export const links: LinksFunction = () => [
 
 export const handle = { i18n: ["translation"] };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export const loader = defineLoader(async ({ request }) => {
   const { getTheme } = await themeSessionResolver(request);
   const locale = await i18nServer.getLocale(request);
   const { toast, headers } = await getToast(request);
@@ -69,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       headers,
     },
   );
-}
+});
 // All routes will inherit this configuration,
 // unless a route overrides the config option
 export const config = {
