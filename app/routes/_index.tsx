@@ -244,7 +244,7 @@ export default function Index() {
           <LangChooser />
           <div className="sm:hidden">
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger aria-label="Menu">
                 <MenuIcon />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
