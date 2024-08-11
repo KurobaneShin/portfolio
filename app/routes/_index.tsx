@@ -5,7 +5,7 @@ import {
   unstable_defineAction as defineAction,
   unstable_defineLoader as defineLoader,
 } from "@vercel/remix";
-
+import { motion, useScroll, useSpring } from "framer-motion";
 import { parseWithZod } from "@conform-to/zod";
 import {
   Await,
@@ -181,7 +181,12 @@ export const action = defineAction(async ({ request }) => {
 export default function Index() {
   const { t } = useTranslation();
   const { projectsQuery, companiesQuery } = useLoaderData<typeof loader>();
-
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
   const lastResult = useActionData<typeof action>();
   const [form, fields] = useForm({
     lastResult,
@@ -229,6 +234,7 @@ export default function Index() {
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="border-b px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-background">
+        <motion.div className="progress-bar" style={{ scaleX }} />
         <Link to="#" className="flex items-center justify-center">
           <Laptop2Icon className="h-6 w-6" />
           <span className="sr-only">{t("title")}</span>
@@ -420,7 +426,10 @@ export default function Index() {
                 key="companies"
                 fallback={<div>Loading...</div>}
               >
-                <Await resolve={companiesQuery} errorElement={<div>Error</div>}>
+                <Await
+                  resolve={companiesQuery}
+                  errorElement={<div>Error</div>}
+                >
                   {(companies) =>
                     companies.map((c) => (
                       <div
