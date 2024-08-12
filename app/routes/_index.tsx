@@ -289,11 +289,11 @@ export default function Index() {
             {navItens.map((nv) => (
               <div
                 key={nv.link}
-                className="hover:after:w-full after:bottom-0 after:left-0  after:absolute after:w-0 after:h-0.5 after:bg-black"
+                className="relative"
               >
                 <Link
                   to={nv.link}
-                  className="text-sm font-medium "
+                  className="after:transition-all after:duration-200 hover:after:w-full after:bottom-0 after:left-0  after:absolute after:w-0 after:h-0.5 after:bg-black text-sm font-medium "
                 >
                   {nv.name}
                 </Link>
