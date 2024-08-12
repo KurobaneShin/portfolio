@@ -5,7 +5,7 @@ import {
   unstable_defineAction as defineAction,
   unstable_defineLoader as defineLoader,
 } from "@vercel/remix";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring, Variants } from "framer-motion";
 import { parseWithZod } from "@conform-to/zod";
 import {
   Await,
@@ -197,6 +197,17 @@ export default function Index() {
     shouldRevalidate: "onInput",
   });
 
+  const defaultAnimation = (duration: number) => {
+    return {
+      initial: { x: "-100%" },
+      animate: { x: 0 },
+      transition: { duration, ease: "easeOut" },
+    };
+  };
+  const titleAnimation = defaultAnimation(0.5);
+  const descAnimation = defaultAnimation(0.75);
+  const buttonAnimation = defaultAnimation(1);
+
   const langs = ["go", "js", "ts", "php"];
   const frontends = ["react", "rn", "vue"];
   const backends = ["express", "next", "remix", "gofiber"];
@@ -230,6 +241,19 @@ export default function Index() {
       name: t("nav.contact"),
     },
   ];
+  const cardVariants: Variants = {
+    offscreen: {
+      y: 300,
+    },
+    onscreen: {
+      y: 0,
+      transition: {
+        type: "spring",
+        bounce: 0.4,
+        duration: 0.8,
+      },
+    },
+  };
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
@@ -252,7 +276,6 @@ export default function Index() {
                   <DropdownMenuItem key={nv.link}>
                     <Link
                       key={nv.link}
-                      prefetch="intent"
                       to={nv.link}
                     >
                       {nv.name}
@@ -264,13 +287,17 @@ export default function Index() {
           </div>
           <div className="hidden sm:flex sm:gap-6">
             {navItens.map((nv) => (
-              <Link
+              <div
                 key={nv.link}
-                to={nv.link}
-                className="text-sm font-medium hover:underline underline-offset-4"
+                className="hover:after:w-full after:bottom-0 after:left-0  after:absolute after:w-0 after:h-0.5 after:bg-black"
               >
-                {nv.name}
-              </Link>
+                <Link
+                  to={nv.link}
+                  className="text-sm font-medium "
+                >
+                  {nv.name}
+                </Link>
+              </div>
             ))}
           </div>
         </nav>
@@ -280,13 +307,19 @@ export default function Index() {
           <div className="container px-4 md:px-6 space-y-10 xl:space-y-16">
             <div className="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:items-center md:gap-16">
               <div>
-                <h1 className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
+                <motion.h1
+                  {...titleAnimation}
+                  className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]"
+                >
                   {t("title")}
-                </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+                </motion.h1>
+                <motion.p
+                  {...descAnimation}
+                  className="mx-auto max-w-[700px] text-muted-foreground md:text-xl"
+                >
                   {t("description")}
-                </p>
-                <div className="space-x-4 mt-6">
+                </motion.p>
+                <motion.div {...buttonAnimation} className="space-x-4 mt-6">
                   <Link
                     to="#contact"
                     className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
@@ -299,10 +332,13 @@ export default function Index() {
                   >
                     {t("seeProjects")}
                   </Link>
-                </div>
+                </motion.div>
               </div>
               <div className="flex flex-col  items-start space-y-4">
-                <img
+                <motion.img
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
                   src="https://github.com/kurobaneshin.png"
                   width={400}
                   height={400}
@@ -325,30 +361,41 @@ export default function Index() {
                 </p>
               </div>
             </div>
+
             <div className="mx-auto grid items-stretch gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={projectsQuery}>
                   {(projects) =>
                     projects.map((p) => (
-                      <Link
-                        to={p.link}
-                        target="_blank"
-                        rel="noreferrer"
+                      <motion.div
+                        initial="offscreen"
+                        whileInView="onscreen"
+                        viewport={{ once: true, amount: 0.8 }}
                         key={p.id}
-                        className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                       >
-                        <img
-                          src={p.picture}
-                          width={300}
-                          height={200}
-                          alt={p.title}
-                          className="rounded-lg object-cover"
-                        />
-                        <h3 className="text-lg font-bold">{p.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {p.description}
-                        </p>
-                      </Link>
+                        <motion.div
+                          variants={cardVariants}
+                        >
+                          <Link
+                            to={p.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="duration-300 group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <img
+                              src={p.picture}
+                              width={300}
+                              height={200}
+                              alt={p.title}
+                              className="rounded-lg object-cover"
+                            />
+                            <h3 className="text-lg font-bold">{p.title}</h3>
+                            <p className="text-sm">
+                              {p.description}
+                            </p>
+                          </Link>
+                        </motion.div>
+                      </motion.div>
                     ))}
                 </Await>
               </Suspense>
@@ -370,43 +417,63 @@ export default function Index() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-              <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
+            <motion.div
+              initial="offscreen"
+              whileInView="onscreen"
+              viewport={{ once: true, amount: 0.8 }}
+              className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12"
+            >
+              <motion.div
+                variants={cardVariants}
+                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              >
                 <CodepenIcon className="h-12 w-12" />
                 <h3 className="text-lg font-bold">React</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm ">
                   {t("skills.react")}
                 </p>
-              </div>
-              <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
+              </motion.div>
+              <motion.div
+                variants={cardVariants}
+                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              >
                 <CodepenIcon className="h-12 w-12" />
                 <h3 className="text-lg font-bold">Node.js</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm ">
                   {t("skills.node")}
                 </p>
-              </div>
-              <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
+              </motion.div>
+              <motion.div
+                variants={cardVariants}
+                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              >
                 <MoveIcon className="h-12 w-12" />
                 <h3 className="text-lg font-bold">Go</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm ">
                   {t("skills.go")}
                 </p>
-              </div>
-              <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
+              </motion.div>
+              <motion.div
+                variants={cardVariants}
+                className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              >
                 <MoveIcon className="h-12 w-12" />
                 <h3 className="text-lg font-bold">Blockchain</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm ">
                   {t("skills.blockchain")}
                 </p>
-              </div>
-              <div className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground">
+              </motion.div>
+              <motion.div
+                variants={cardVariants}
+                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              >
                 <MoveIcon className="h-12 w-12" />
                 <h3 className="text-lg font-bold">Solidity</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm">
                   {t("skills.solidity")}
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
         <section id="experience" className="w-full py-12 md:py-24 lg:py-32">
@@ -437,10 +504,10 @@ export default function Index() {
                         className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                       >
                         <h3 className="text-lg font-bold">{c.title}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm ">
                           {c.client} | {c.start} - {c.end ?? "Present"}
                         </p>
-                        <ul className="list-disc pl-4 text-sm text-muted-foreground">
+                        <ul className="list-disc pl-4 text-sm ">
                           {c.items.map((i, idx) => <li key={idx}>{i}</li>)}
                         </ul>
                       </div>
