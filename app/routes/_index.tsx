@@ -417,63 +417,94 @@ export default function Index() {
                 </p>
               </div>
             </div>
-            <motion.div
-              initial="offscreen"
-              whileInView="onscreen"
-              viewport={{ once: true, amount: 0.8 }}
-              className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12"
-            >
+            <div className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12">
               <motion.div
-                variants={cardVariants}
-                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.8 }}
+                className="grid"
               >
-                <CodepenIcon className="h-12 w-12" />
-                <h3 className="text-lg font-bold">React</h3>
-                <p className="text-sm ">
-                  {t("skills.react")}
-                </p>
+                <motion.div
+                  variants={cardVariants}
+                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                >
+                  <CodepenIcon className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">React</h3>
+                  <p className="text-sm ">
+                    {t("skills.react")}
+                  </p>
+                </motion.div>
               </motion.div>
               <motion.div
-                variants={cardVariants}
-                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.8 }}
+                className="grid"
               >
-                <CodepenIcon className="h-12 w-12" />
-                <h3 className="text-lg font-bold">Node.js</h3>
-                <p className="text-sm ">
-                  {t("skills.node")}
-                </p>
+                <motion.div
+                  variants={cardVariants}
+                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                >
+                  <CodepenIcon className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Node.js</h3>
+                  <p className="text-sm ">
+                    {t("skills.node")}
+                  </p>
+                </motion.div>
               </motion.div>
               <motion.div
-                variants={cardVariants}
-                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.8 }}
+                className="grid"
               >
-                <MoveIcon className="h-12 w-12" />
-                <h3 className="text-lg font-bold">Go</h3>
-                <p className="text-sm ">
-                  {t("skills.go")}
-                </p>
+                <motion.div
+                  variants={cardVariants}
+                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                >
+                  <MoveIcon className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Go</h3>
+                  <p className="text-sm ">
+                    {t("skills.go")}
+                  </p>
+                </motion.div>
               </motion.div>
               <motion.div
-                variants={cardVariants}
-                className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.8 }}
+                className="grid"
               >
-                <MoveIcon className="h-12 w-12" />
-                <h3 className="text-lg font-bold">Blockchain</h3>
-                <p className="text-sm ">
-                  {t("skills.blockchain")}
-                </p>
+                <motion.div
+                  variants={cardVariants}
+                  className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                >
+                  <MoveIcon className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Blockchain</h3>
+                  <p className="text-sm ">
+                    {t("skills.blockchain")}
+                  </p>
+                </motion.div>
               </motion.div>
+
               <motion.div
-                variants={cardVariants}
-                className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.8 }}
+                className="grid"
               >
-                <MoveIcon className="h-12 w-12" />
-                <h3 className="text-lg font-bold">Solidity</h3>
-                <p className="text-sm">
-                  {t("skills.solidity")}
-                </p>
+                <motion.div
+                  variants={cardVariants}
+                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                >
+                  <MoveIcon className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Solidity</h3>
+                  <p className="text-sm">
+                    {t("skills.solidity")}
+                  </p>
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </div>
           </div>
         </section>
         <section id="experience" className="w-full py-12 md:py-24 lg:py-32">

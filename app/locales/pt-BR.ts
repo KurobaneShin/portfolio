@@ -1,7 +1,6 @@
 export default {
   title: "Kurobane(Icaro)",
-  description:
-    "Desenvolvedor full-stack sênior com expertise em React, Node.js e Go.",
+  description: "Engenheiro de software com expertise em React, Node.js e Go.",
   hire: "Me contrate",
   seeProjects: "Meus Projetos",
   langChooser: {
