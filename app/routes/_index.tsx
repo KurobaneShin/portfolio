@@ -44,6 +44,9 @@ import { supabase } from "~/modules/supabase.server";
 import { jsonWithError, jsonWithSuccess } from "remix-toast";
 import { cachified } from "~/modules/cache.server";
 import { Suspense } from "react";
+import { FaNodeJs, FaReact } from "react-icons/fa";
+import { FaGolang } from "react-icons/fa6";
+import { SiHiveBlockchain, SiSolidity } from "react-icons/si";
 
 export const links: LinksFunction = () => [
   { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
@@ -428,7 +431,7 @@ export default function Index() {
                   variants={cardVariants}
                   className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <CodepenIcon className="h-12 w-12" />
+                  <FaReact className="h-12 w-12" />
                   <h3 className="text-lg font-bold">React</h3>
                   <p className="text-sm ">
                     {t("skills.react")}
@@ -445,7 +448,7 @@ export default function Index() {
                   variants={cardVariants}
                   className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <CodepenIcon className="h-12 w-12" />
+                  <FaNodeJs className="h-12 w-12" />
                   <h3 className="text-lg font-bold">Node.js</h3>
                   <p className="text-sm ">
                     {t("skills.node")}
@@ -462,7 +465,7 @@ export default function Index() {
                   variants={cardVariants}
                   className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <MoveIcon className="h-12 w-12" />
+                  <FaGolang className="h-12 w-12" />
                   <h3 className="text-lg font-bold">Go</h3>
                   <p className="text-sm ">
                     {t("skills.go")}
@@ -479,7 +482,7 @@ export default function Index() {
                   variants={cardVariants}
                   className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <MoveIcon className="h-12 w-12" />
+                  <SiHiveBlockchain className="h-12 w-12" />
                   <h3 className="text-lg font-bold">Blockchain</h3>
                   <p className="text-sm ">
                     {t("skills.blockchain")}
@@ -497,7 +500,7 @@ export default function Index() {
                   variants={cardVariants}
                   className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <MoveIcon className="h-12 w-12" />
+                  <SiSolidity className="h-12 w-12" />
                   <h3 className="text-lg font-bold">Solidity</h3>
                   <p className="text-sm">
                     {t("skills.solidity")}
