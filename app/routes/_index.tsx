@@ -44,9 +44,15 @@ import { supabase } from "~/modules/supabase.server";
 import { jsonWithError, jsonWithSuccess } from "remix-toast";
 import { cachified } from "~/modules/cache.server";
 import { Suspense } from "react";
-import { FaNodeJs, FaReact } from "react-icons/fa";
-import { FaGolang } from "react-icons/fa6";
-import { SiHiveBlockchain, SiSolidity } from "react-icons/si";
+import { FaDatabase, FaDocker, FaLaptopCode, FaNodeJs, FaReact, FaVuejs } from "react-icons/fa";
+import { FaGolang, FaTv } from "react-icons/fa6";
+import { SiExpress, SiHiveBlockchain, SiKubernetes, SiMongodb, SiPrisma, SiRedis, SiSolidity, SiTrpc, SiTypeorm, SiTypescript } from "react-icons/si";
+import { IoLogoJavascript } from "react-icons/io";
+import { DiPhp } from "react-icons/di";
+import { RiNextjsFill, RiRemixRunFill, RiTailwindCssFill } from "react-icons/ri";
+import { BiLogoPostgresql } from "react-icons/bi";
+import { GrMysql, GrTools } from "react-icons/gr";
+import { IoLibrarySharp } from "react-icons/io5";
 
 export const links: LinksFunction = () => [
   { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
@@ -211,12 +217,110 @@ export default function Index() {
   const descAnimation = defaultAnimation(0.75);
   const buttonAnimation = defaultAnimation(1);
 
-  const langs = ["go", "js", "ts", "php"];
-  const frontends = ["react", "rn", "vue"];
-  const backends = ["express", "next", "remix", "gofiber"];
-  const libraries = ["prisma", "typeorm", "trpc", "gorm"];
-  const tools = ["tailwind", "node", "docker", "k8"];
-  const databases = ["pg", "mongo", "redis", "mysql"];
+  const langs = [
+    {
+      name: "go",
+      icon: FaGolang,
+    },
+    {
+      name: "js",
+      icon: IoLogoJavascript,
+    },
+    {
+      name: "ts",
+      icon: SiTypescript,
+    },
+    {
+      name: "php",
+      icon: DiPhp,
+    },
+  ];
+  const frontends = [
+    {
+      name: "react",
+      icon: FaReact,
+    },
+    {
+      name: "rn",
+      icon: FaReact,
+    },
+    {
+      name: "vue",
+      icon: FaVuejs,
+    },
+  ];
+  const backends = [
+    {
+      name: "express",
+      icon: SiExpress,
+    },
+    {
+      name: "next",
+      icon: RiNextjsFill,
+    },
+    {
+      name: "remix",
+      icon: RiRemixRunFill,
+    },
+    {
+      name: "gofiber",
+      icon: FaGolang,
+    },
+  ];
+  const libraries = [
+    {
+      name: "prisma",
+      icon: SiPrisma,
+    },
+    {
+      name: "typeorm",
+      icon: SiTypeorm,
+    },
+    {
+      name: "trpc",
+      icon: SiTrpc,
+    },
+    {
+      name: "gorm",
+      icon: SiTypeorm,
+    },
+  ]; 
+  const tools = [
+    {
+      name: "tailwind",
+      icon: RiTailwindCssFill,
+    },
+    {
+      name: "node",
+      icon: FaNodeJs,
+    },
+    {
+      name: "docker",
+      icon: FaDocker,
+    },
+    {
+      name: "k8",
+      icon: SiKubernetes,
+    },
+  ];
+  const databases = [
+    {
+      name: "pg",
+      icon: BiLogoPostgresql,
+    },
+    {
+      name: "mongo",
+      icon: SiMongodb,
+    },
+    {
+      name: "redis",
+      icon: SiRedis,
+    },
+    {
+      name: "mysql",
+      icon: GrMysql,
+    },
+  ];
 
   const navItens = [
     {
@@ -568,7 +672,7 @@ export default function Index() {
               <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                    <FaLaptopCode className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold">
                     {t("languages.title")}
@@ -578,11 +682,11 @@ export default function Index() {
                   {langs.map((l, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                        <l.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="capitalize text-muted-foreground">
-                        {t(`languages.${l}.name`)} -{" "}
-                        {t(`languages.${l}.experience`)}
+                        {t(`languages.${l.name}.name`)} -{" "}
+                        {t(`languages.${l.name}.experience`)}
                       </p>
                     </div>
                   ))}
@@ -591,7 +695,7 @@ export default function Index() {
               <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                    <FaTv className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold">
                     {t("frontends.title")}
@@ -601,11 +705,11 @@ export default function Index() {
                   {frontends.map((f, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                        <f.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="capitalize text-muted-foreground">
-                        {t(`frontends.${f}.name`)} -{" "}
-                        {t(`frontends.${f}.experience`)}
+                        {t(`frontends.${f.name}.name`)} -{" "}
+                        {t(`frontends.${f.name}.experience`)}
                       </p>
                     </div>
                   ))}
@@ -625,11 +729,11 @@ export default function Index() {
                   {backends.map((b, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                        <b.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="capitalize text-muted-foreground">
-                        {t(`backends.${b}.name`)} -{" "}
-                        {t(`backends.${b}.experience`)}
+                        {t(`backends.${b.name}.name`)} -{" "}
+                        {t(`backends.${b.name}.experience`)}
                       </p>
                     </div>
                   ))}
@@ -638,7 +742,7 @@ export default function Index() {
               <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                    <IoLibrarySharp className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold">
                     {t("libraries.title")}
@@ -648,11 +752,11 @@ export default function Index() {
                   {libraries.map((l, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                        <l.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="capitalize text-muted-foreground">
-                        {t(`libraries.${l}.name`)} -{" "}
-                        {t(`libraries.${l}.experience`)}
+                        {t(`libraries.${l.name}.name`)} -{" "}
+                        {t(`libraries.${l.name}.experience`)}
                       </p>
                     </div>
                   ))}
@@ -661,7 +765,7 @@ export default function Index() {
               <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                    <GrTools className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold">Tools</h3>
                 </div>
@@ -669,11 +773,11 @@ export default function Index() {
                   {tools.map((tool, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                        <tool.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="capitalize text-muted-foreground">
-                        {t(`tools.${tool}.name`)} -{" "}
-                        {t(`tools.${tool}.experience`)}
+                        {t(`tools.${tool.name}.name`)} -{" "}
+                        {t(`tools.${tool.name}.experience`)}
                       </p>
                     </div>
                   ))}
@@ -682,7 +786,7 @@ export default function Index() {
               <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
+                    <FaDatabase className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold">Databases</h3>
                 </div>
@@ -690,11 +794,11 @@ export default function Index() {
                   {databases.map((db, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <CodeIcon className="w-4 h-4 text-primary-foreground" />
+                        <db.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="capitalize text-muted-foreground">
-                        {t(`databases.${db}.name`)} -{" "}
-                        {t(`databases.${db}.experience`)}
+                        {t(`databases.${db.name}.name`)} -{" "}
+                        {t(`databases.${db.name}.experience`)}
                       </p>
                     </div>
                   ))}
