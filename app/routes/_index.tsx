@@ -186,7 +186,14 @@ const CASES = [
   "confiou",
 ] as const;
 
-const STATS = ["e2e", "parity", "sheets", "destroys"] as const;
+const CLIENTS = [
+  "globo",
+  "sharecare",
+  "cloudkitchens",
+  "casacor",
+  "minhasinscricoes",
+  "jveiga",
+] as const;
 
 const CAPABILITIES: { key: string; name: string; icon: IconType }[] = [
   { key: "go", name: "Go", icon: FaGolang },
@@ -470,20 +477,26 @@ export default function Index() {
                   </p>
                 </div>
               </div>
-              <p className="eyebrow mt-8">{t("hero.statsTitle")}</p>
-              <dl className="mt-4 divide-y border-y">
-                {STATS.map((k) => (
-                  <div key={k} className="grid grid-cols-[5.5rem_1fr] items-baseline gap-4 py-4">
-                    <dt className="font-display text-4xl font-light tabular-nums tracking-tight">
-                      {t(`hero.stats.${k}.value`)}
-                    </dt>
-                    <dd className="text-sm leading-snug">
-                      {t(`hero.stats.${k}.label`)}
-                      <span className="eyebrow mt-1 block">{t(`hero.stats.${k}.source`)}</span>
-                    </dd>
-                  </div>
+              <p className="eyebrow mt-8">{t("hero.clientsTitle")}</p>
+              <ul className="mt-4 border-t">
+                {CLIENTS.map((k) => (
+                  <li key={k}>
+                    <a
+                      href="#cases"
+                      className="group flex items-baseline gap-3 border-b py-3.5 transition-colors"
+                    >
+                      <span className="font-display text-[1.6rem] font-light leading-none tracking-[-0.01em] transition-colors group-hover:text-signal">
+                        {t(`hero.clients.${k}.name`)}
+                      </span>
+                      <span
+                        aria-hidden
+                        className="mb-1 flex-1 border-b border-dotted border-muted-foreground/40"
+                      />
+                      <span className="eyebrow">{t(`hero.clients.${k}.sector`)}</span>
+                    </a>
+                  </li>
                 ))}
-              </dl>
+              </ul>
             </aside>
           </div>
         </section>
