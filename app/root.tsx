@@ -1,6 +1,6 @@
 import {
   LinksFunction,
-  unstable_defineLoader as defineLoader,
+  LoaderFunctionArgs,
 } from "@vercel/remix";
 import {
   json,
@@ -51,7 +51,7 @@ export const links: LinksFunction = () => [
 
 export const handle = { i18n: ["translation"] };
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { getTheme } = await themeSessionResolver(request);
   const locale = await i18nServer.getLocale(request);
   const { toast, headers } = await getToast(request);
@@ -72,7 +72,7 @@ export const loader = defineLoader(async ({ request }) => {
       headers,
     },
   );
-});
+};
 // All routes will inherit this configuration,
 // unless a route overrides the config option
 export const config = {
