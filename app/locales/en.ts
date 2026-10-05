@@ -1,9 +1,23 @@
 export default {
-  title: "Kurobane(Icaro)",
+  title: "Kurobane",
   description:
     "Senior software engineer. I build and fix critical systems (ticketing, finance, content platforms and data) across media, healthcare, food-tech and construction, always with numbers that match the source, measured performance and infrastructure as code.",
   hire: "Hire me",
   seeProjects: "View Projects",
+  hero: {
+    headline: "Critical systems, with numbers that match the source.",
+    eyebrow: "Software engineering · Critical systems",
+    available: "Taking on new projects",
+    location: "Brazil · UTC−3",
+    statsTitle: "Recent measurements",
+    stats: {
+      e2e: { value: "20×", label: "faster end-to-end tests", source: "Sharecare" },
+      parity: { value: "39/40", label: "pairs matching the legacy engine", source: "MinhasInscrições" },
+      sheets: { value: "14", label: "workbooks in exact parity", source: "CloudKitchens" },
+      destroys: { value: "0", label: "destroys importing production into Terraform", source: "J. Veiga" },
+    },
+  },
+  present: "present",
   langChooser: {
     title: "Select Language",
     english: "english",

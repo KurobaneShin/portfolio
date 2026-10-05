@@ -3,61 +3,63 @@
 @tailwind utilities;
 
 @layer base {
+  /* Washi paper, sumi ink, one ai-iro signal. */
   :root {
-    --background: 0 0% 85%;
-    --foreground: 0 0% 10%;
-    --primary: 0 0% 80%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 70%;
-    --secondary-foreground: 0 0% 10%;
-    --accent: 240 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 32%;
-    --destructive-foreground: 0 0% 98%;
-    --muted: 0 0% 75%;
-    --muted-foreground: 0 0% 10%;
-    --card: 0 0% 95%;
-    --card-foreground: 0 0% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --border: 0 0% 60%;
-    --input: 0 0% 60%;
-    --ring: 0 0% 10%;
-    --radius: 0rem;
-    --font-heading: 'IBM Plex Mono', monospace;
-    --font-body: 'IBM Plex Mono', monospace;
+    --background: 42 24% 95%;
+    --foreground: 220 16% 10%;
+    --primary: 220 16% 10%;
+    --primary-foreground: 42 24% 95%;
+    --secondary: 42 14% 89%;
+    --secondary-foreground: 220 16% 10%;
+    --accent: 42 14% 89%;
+    --accent-foreground: 220 16% 10%;
+    --signal: 228 68% 44%;
+    --destructive: 2 70% 42%;
+    --destructive-foreground: 42 24% 95%;
+    --muted: 42 16% 91%;
+    --muted-foreground: 220 7% 40%;
+    --card: 42 30% 97%;
+    --card-foreground: 220 16% 10%;
+    --popover: 42 30% 97%;
+    --popover-foreground: 220 16% 10%;
+    --border: 40 9% 80%;
+    --input: 40 9% 72%;
+    --ring: 228 68% 44%;
+    --radius: 0.125rem;
+    --grain-opacity: 0.05;
   }
 
   .dark,
   :root[class~="dark"] {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 85%;
-    --primary: 0 0% 20%;
-    --primary-foreground: 0 0% 85%;
-    --secondary: 0 0% 30%;
-    --secondary-foreground: 0 0% 85%;
-    --accent: 240 100% 50%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 84% 32%;
-    /* Keeping this the same for visibility */
-    --destructive-foreground: 0 0% 10%;
-    --muted: 0 0% 25%;
-    --muted-foreground: 0 0% 85%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 85%;
-    --popover: 0 0% 20%;
-    --popover-foreground: 240 10% 96.1%;
-    --border: 0 0% 40%;
-    --input: 0 0% 40%;
-    --ring: 0 0% 85%;
-    --font-heading: 'IBM Plex Mono', monospace;
-    --font-body: 'IBM Plex Mono', monospace;
+    --background: 220 14% 6.5%;
+    --foreground: 40 16% 89%;
+    --primary: 40 16% 89%;
+    --primary-foreground: 220 14% 6.5%;
+    --secondary: 220 10% 12%;
+    --secondary-foreground: 40 16% 89%;
+    --accent: 220 10% 13%;
+    --accent-foreground: 40 16% 89%;
+    --signal: 226 90% 72%;
+    --destructive: 2 70% 58%;
+    --destructive-foreground: 220 14% 6.5%;
+    --muted: 220 10% 10%;
+    --muted-foreground: 40 6% 60%;
+    --card: 220 12% 8.5%;
+    --card-foreground: 40 16% 89%;
+    --popover: 220 12% 9%;
+    --popover-foreground: 40 16% 89%;
+    --border: 220 8% 19%;
+    --input: 220 8% 26%;
+    --ring: 226 90% 72%;
+    --grain-opacity: 0.07;
   }
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   * {
@@ -65,7 +67,19 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "ss01", "kern";
+  }
+
+  /* Paper grain: one fixed layer, no repaint on scroll. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   h1,
@@ -74,7 +88,12 @@
   h4,
   h5,
   h6 {
-    @apply font-heading;
+    @apply font-display;
+  }
+
+  ::selection {
+    background: hsl(var(--signal));
+    color: hsl(var(--background));
   }
 
   .progress-bar {
@@ -82,8 +101,36 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: hsl(var(--accent));
+    height: 1px;
+    background: hsl(var(--signal));
     transform-origin: 0%;
+    z-index: 70;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.18em] text-muted-foreground;
+  }
+
+  .rule-x {
+    background-image: linear-gradient(
+      to right,
+      hsl(var(--border)) 1px,
+      transparent 1px
+    );
   }
 }

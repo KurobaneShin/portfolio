@@ -1,9 +1,23 @@
 export default {
-  title: "Kurobane(Icaro)",
+  title: "Kurobane",
   description:
     "Engenheiro de software sênior. Construo e conserto sistemas críticos (bilheteria, financeiro, plataformas de conteúdo e dados) em mídia, saúde, food-tech e construção, sempre com números que conferem com a fonte, performance medida e infraestrutura em código.",
   hire: "Me contrate",
   seeProjects: "Meus Projetos",
+  hero: {
+    headline: "Sistemas críticos, com números que batem com a fonte.",
+    eyebrow: "Engenharia de software · Sistemas críticos",
+    available: "Aceitando novos projetos",
+    location: "Brasil · UTC−3",
+    statsTitle: "Medições recentes",
+    stats: {
+      e2e: { value: "20×", label: "testes e2e mais rápidos", source: "Sharecare" },
+      parity: { value: "39/40", label: "pares em paridade com o legado", source: "MinhasInscrições" },
+      sheets: { value: "14", label: "planilhas em paridade exata", source: "CloudKitchens" },
+      destroys: { value: "0", label: "destruições ao importar a produção no Terraform", source: "J. Veiga" },
+    },
+  },
+  present: "atual",
   langChooser: {
     title: "Selecione Linguagem",
     english: "Inglês",

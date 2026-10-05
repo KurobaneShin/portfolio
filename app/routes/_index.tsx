@@ -5,36 +5,25 @@ import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
 } from "@vercel/remix";
-import { motion, useScroll, useSpring, Variants } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { parseWithZod } from "@conform-to/zod";
 import {
   Await,
   Form,
   json,
-  Link,
   useActionData,
   useLoaderData,
 } from "@remix-run/react";
-import {
-  CodeIcon,
-  CodepenIcon,
-  Laptop2Icon,
-  MenuIcon,
-  MoveIcon,
-  XIcon,
-} from "lucide-react";
+import { ArrowUpRightIcon, MenuIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LangChooser } from "~/components/custom/LangChooser";
 import { ModeToggle } from "~/components/custom/ModeToggle";
-import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Input } from "~/components/ui/input";
-import { Textarea } from "~/components/ui/textarea";
 import i18nServer from "~/modules/i18n.server";
 import { resend } from "~/modules/resend.server";
 import { z } from "zod";
@@ -43,16 +32,17 @@ import { getMeta } from "~/modules/seo";
 import { supabase } from "~/modules/supabase.server";
 import { jsonWithError, jsonWithSuccess } from "remix-toast";
 import { cachified } from "~/modules/cache.server";
-import { Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 import { FaDatabase, FaDocker, FaLaptopCode, FaNodeJs, FaReact, FaVuejs } from "react-icons/fa";
 import { FaGolang, FaTv } from "react-icons/fa6";
 import { SiExpress, SiGooglebigquery, SiKubernetes, SiMongodb, SiPrisma, SiRedis, SiTerraform, SiTrpc, SiTypeorm, SiTypescript } from "react-icons/si";
 import { IoLogoJavascript } from "react-icons/io";
 import { DiPhp } from "react-icons/di";
-import { RiNextjsFill, RiRemixRunFill, RiSpeedUpFill, RiTailwindCssFill } from "react-icons/ri";
+import { RiCodeSSlashLine, RiNextjsFill, RiRemixRunFill, RiSpeedUpFill, RiTailwindCssFill } from "react-icons/ri";
 import { BiLogoPostgresql } from "react-icons/bi";
 import { GrMysql, GrTools } from "react-icons/gr";
 import { IoLibrarySharp } from "react-icons/io5";
+import { IconType } from "react-icons";
 
 export const links: LinksFunction = () => [
   { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
@@ -187,6 +177,153 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   );
 };
 
+const CASES = [
+  "globo",
+  "sharecare",
+  "cloudkitchens",
+  "minhasinscricoes",
+  "jveiga",
+  "confiou",
+] as const;
+
+const STATS = ["e2e", "parity", "sheets", "destroys"] as const;
+
+const CAPABILITIES: { key: string; name: string; icon: IconType }[] = [
+  { key: "go", name: "Go", icon: FaGolang },
+  { key: "node", name: "Node.js", icon: FaNodeJs },
+  { key: "react", name: "React", icon: FaReact },
+  { key: "cloud", name: "Cloud & IaC", icon: SiTerraform },
+  { key: "data", name: "Data", icon: SiGooglebigquery },
+  { key: "performance", name: "Performance", icon: RiSpeedUpFill },
+];
+
+const STACK: { group: string; icon: IconType; items: { name: string; icon: IconType }[] }[] = [
+  {
+    group: "languages",
+    icon: FaLaptopCode,
+    items: [
+      { name: "go", icon: FaGolang },
+      { name: "ts", icon: SiTypescript },
+      { name: "js", icon: IoLogoJavascript },
+      { name: "php", icon: DiPhp },
+    ],
+  },
+  {
+    group: "frontends",
+    icon: FaTv,
+    items: [
+      { name: "react", icon: FaReact },
+      { name: "rn", icon: FaReact },
+      { name: "vue", icon: FaVuejs },
+    ],
+  },
+  {
+    group: "backends",
+    icon: RiCodeSSlashLine,
+    items: [
+      { name: "express", icon: SiExpress },
+      { name: "next", icon: RiNextjsFill },
+      { name: "remix", icon: RiRemixRunFill },
+      { name: "gofiber", icon: FaGolang },
+    ],
+  },
+  {
+    group: "libraries",
+    icon: IoLibrarySharp,
+    items: [
+      { name: "prisma", icon: SiPrisma },
+      { name: "typeorm", icon: SiTypeorm },
+      { name: "trpc", icon: SiTrpc },
+      { name: "gorm", icon: SiTypeorm },
+    ],
+  },
+  {
+    group: "tools",
+    icon: GrTools,
+    items: [
+      { name: "tailwind", icon: RiTailwindCssFill },
+      { name: "node", icon: FaNodeJs },
+      { name: "docker", icon: FaDocker },
+      { name: "k8", icon: SiKubernetes },
+    ],
+  },
+  {
+    group: "databases",
+    icon: FaDatabase,
+    items: [
+      { name: "pg", icon: BiLogoPostgresql },
+      { name: "mongo", icon: SiMongodb },
+      { name: "redis", icon: SiRedis },
+      { name: "mysql", icon: GrMysql },
+    ],
+  },
+];
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+// "2026-08-19" → "2026.08"
+const yearMonth = (date: string | null) => date?.slice(0, 7).replace("-", ".");
+
+const hostOf = (link: string) => {
+  try {
+    return new URL(link).host.replace(/^www\./, "");
+  } catch {
+    return link;
+  }
+};
+
+function Reveal({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const reduce = useReducedMotion();
+  if (reduce) return <div className={className}>{children}</div>;
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function SectionHead({
+  index,
+  title,
+  description,
+}: {
+  index: number;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <Reveal className="grid gap-6 border-t pt-6 md:grid-cols-12 md:gap-8">
+      <p className="eyebrow md:col-span-3">
+        <span className="text-signal">§ {pad(index)}</span>
+      </p>
+      <div className="md:col-span-9">
+        <h2 className="text-4xl font-light leading-[1.05] tracking-[-0.02em] sm:text-5xl lg:text-6xl">
+          {title}
+        </h2>
+        {description && (
+          <p className="mt-6 max-w-[62ch] text-[1.0625rem] leading-relaxed text-muted-foreground">
+            {description}
+          </p>
+        )}
+      </div>
+    </Reveal>
+  );
+}
+
 export default function Index() {
   const { t } = useTranslation();
   const { projectsQuery, companiesQuery } = useLoaderData<typeof loader>();
@@ -206,771 +343,395 @@ export default function Index() {
     shouldRevalidate: "onInput",
   });
 
-  const defaultAnimation = (duration: number) => {
-    return {
-      initial: { x: "-100%" },
-      animate: { x: 0 },
-      transition: { duration, ease: "easeOut" },
-    };
-  };
-  const titleAnimation = defaultAnimation(0.5);
-  const descAnimation = defaultAnimation(0.75);
-  const buttonAnimation = defaultAnimation(1);
-
-  const langs = [
-    {
-      name: "go",
-      icon: FaGolang,
-    },
-    {
-      name: "js",
-      icon: IoLogoJavascript,
-    },
-    {
-      name: "ts",
-      icon: SiTypescript,
-    },
-    {
-      name: "php",
-      icon: DiPhp,
-    },
-  ];
-  const frontends = [
-    {
-      name: "react",
-      icon: FaReact,
-    },
-    {
-      name: "rn",
-      icon: FaReact,
-    },
-    {
-      name: "vue",
-      icon: FaVuejs,
-    },
-  ];
-  const backends = [
-    {
-      name: "express",
-      icon: SiExpress,
-    },
-    {
-      name: "next",
-      icon: RiNextjsFill,
-    },
-    {
-      name: "remix",
-      icon: RiRemixRunFill,
-    },
-    {
-      name: "gofiber",
-      icon: FaGolang,
-    },
-  ];
-  const libraries = [
-    {
-      name: "prisma",
-      icon: SiPrisma,
-    },
-    {
-      name: "typeorm",
-      icon: SiTypeorm,
-    },
-    {
-      name: "trpc",
-      icon: SiTrpc,
-    },
-    {
-      name: "gorm",
-      icon: SiTypeorm,
-    },
-  ]; 
-  const tools = [
-    {
-      name: "tailwind",
-      icon: RiTailwindCssFill,
-    },
-    {
-      name: "node",
-      icon: FaNodeJs,
-    },
-    {
-      name: "docker",
-      icon: FaDocker,
-    },
-    {
-      name: "k8",
-      icon: SiKubernetes,
-    },
-  ];
-  const databases = [
-    {
-      name: "pg",
-      icon: BiLogoPostgresql,
-    },
-    {
-      name: "mongo",
-      icon: SiMongodb,
-    },
-    {
-      name: "redis",
-      icon: SiRedis,
-    },
-    {
-      name: "mysql",
-      icon: GrMysql,
-    },
-  ];
-
-  const cases = [
-    "globo",
-    "sharecare",
-    "cloudkitchens",
-    "minhasinscricoes",
-    "jveiga",
-    "confiou",
-  ];
-
   const navItens = [
-    {
-      link: "#hero",
-      name: t("nav.about"),
-    },
-    {
-      link: "#cases",
-      name: t("nav.cases"),
-    },
-    {
-      link: "#projects",
-      name: t("nav.projects"),
-    },
-    {
-      link: "#skills",
-      name: t("nav.skills"),
-    },
-    {
-      link: "#experience",
-      name: t("nav.exp"),
-    },
-    {
-      link: "#expertise",
-      name: t("nav.expertise"),
-    },
-    {
-      link: "#contact",
-      name: t("nav.contact"),
-    },
+    { link: "#cases", name: t("nav.cases") },
+    { link: "#projects", name: t("nav.projects") },
+    { link: "#skills", name: t("nav.skills") },
+    { link: "#experience", name: t("nav.exp") },
+    { link: "#expertise", name: t("nav.expertise") },
+    { link: "#contact", name: t("nav.contact") },
   ];
-  const cardVariants: Variants = {
-    offscreen: {
-      y: 300,
-    },
-    onscreen: {
-      y: 0,
-      transition: {
-        type: "spring",
-        bounce: 0.4,
-        duration: 0.8,
-      },
-    },
-  };
+
+  const fieldClass =
+    "w-full border-0 border-b border-input bg-transparent px-0 py-3 text-base placeholder:text-muted-foreground/70 focus:border-signal focus:outline-none focus:ring-0 transition-colors";
+
+  const errorsOf = (errors?: string[]) =>
+    errors?.map((e) => (
+      <p key={e} className="mt-2 flex items-center gap-1 font-mono text-xs text-destructive">
+        <XIcon className="h-3 w-3" />
+        {t(`validations.${e}`)}
+      </p>
+    ));
 
   return (
-    <div className="flex flex-col min-h-[100dvh]">
-      <header className="border-b px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-background">
-        <motion.div className="progress-bar" style={{ scaleX }} />
-        <Link to="#" className="flex items-center justify-center">
-          <Laptop2Icon className="h-6 w-6" />
-          <span className="sr-only">{t("title")}</span>
-        </Link>
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-          <ModeToggle />
-          <LangChooser />
-          <div className="sm:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger aria-label="Menu">
-                <MenuIcon />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {navItens.map((nv) => (
-                  <DropdownMenuItem key={nv.link}>
-                    <Link
-                      key={nv.link}
-                      to={nv.link}
-                    >
-                      {nv.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="hidden sm:flex sm:gap-6">
-            {navItens.map((nv) => (
-              <div
-                key={nv.link}
-                className="relative"
-              >
-                <Link
-                  to={nv.link}
-                  className="after:transition-all after:duration-200 hover:after:w-full after:bottom-0 after:left-0  after:absolute after:w-0 after:h-0.5 after:bg-black text-sm font-medium "
+    <div className="flex min-h-[100dvh] flex-col">
+      <motion.div className="progress-bar" style={{ scaleX }} />
+      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-[1280px] items-center px-5 md:px-10">
+          <a href="#hero" className="flex items-baseline gap-2">
+            <span className="font-display text-xl tracking-tight">{t("title")}</span>
+            <span className="eyebrow hidden sm:inline">Ícaro</span>
+          </a>
+          <nav className="ml-auto flex items-center gap-1">
+            <div className="hidden items-center gap-6 pr-4 lg:flex">
+              {navItens.map((nv) => (
+                <a
+                  key={nv.link}
+                  href={nv.link}
+                  className="eyebrow transition-colors hover:text-foreground"
                 >
                   {nv.name}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </nav>
-      </header>
-      <main className="flex-1">
-        <section id="hero" className="w-full pt-6 md:py-12 lg:py-16 border-b">
-          <div className="container px-4 md:px-6 space-y-10 xl:space-y-16">
-            <div className="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:items-center md:gap-16">
-              <div>
-                <motion.h1
-                  {...titleAnimation}
-                  className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]"
-                >
-                  {t("title")}
-                </motion.h1>
-                <motion.p
-                  {...descAnimation}
-                  className="mx-auto max-w-[700px] text-muted-foreground md:text-xl"
-                >
-                  {t("description")}
-                </motion.p>
-                <motion.div {...buttonAnimation} className="space-x-4 mt-6">
-                  <Link
-                    to="#contact"
-                    className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                  >
-                    {t("hire")}
-                  </Link>
-                  <Link
-                    to="#projects"
-                    className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                  >
-                    {t("seeProjects")}
-                  </Link>
-                </motion.div>
-              </div>
-              <div className="flex flex-col  items-start space-y-4">
-                <motion.img
-                  initial={{ x: "100%" }}
-                  animate={{ x: 0 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  src="https://github.com/kurobaneshin.png"
-                  width={400}
-                  height={400}
-                  alt="Hero"
-                  className="mx-auto aspect-square overflow-hidden rounded-xl obect-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-        <section id="cases" className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  {t("cases.title")}
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  {t("cases.description")}
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {cases.map((c) => (
-                <motion.div
-                  initial="offscreen"
-                  whileInView="onscreen"
-                  viewport={{ once: true, amount: 0.5 }}
-                  className="grid"
-                  key={c}
-                >
-                  <motion.article
-                    variants={cardVariants}
-                    className="flex flex-col gap-2 rounded-lg bg-background p-5 shadow-sm"
-                  >
-                    <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                      {t(`cases.${c}.client`)}
-                    </p>
-                    <h3 className="text-lg font-bold">{t(`cases.${c}.title`)}</h3>
-                    <p className="text-base font-semibold leading-snug">
-                      {t(`cases.${c}.metric`)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {t(`cases.${c}.detail`)}
-                    </p>
-                  </motion.article>
-                </motion.div>
+                </a>
               ))}
             </div>
-          </div>
-        </section>
-        <section id="projects" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  {t("featured.title")}
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  {t("featured.description")}
-                </p>
+            <ModeToggle />
+            <LangChooser />
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger aria-label="Menu" className="p-2">
+                  <MenuIcon className="h-5 w-5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {navItens.map((nv) => (
+                    <DropdownMenuItem key={nv.link} asChild>
+                      <a href={nv.link}>{nv.name}</a>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </nav>
+        </div>
+      </header>
+
+      <main className="flex-1">
+        {/* Hero */}
+        <section id="hero" className="relative overflow-hidden">
+          <div
+            aria-hidden
+            className="rule-x pointer-events-none absolute inset-0 opacity-50 [background-size:calc(100%/12)_100%] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
+          />
+          <div className="relative mx-auto grid max-w-[1280px] gap-12 px-5 pb-20 pt-16 md:grid-cols-12 md:px-10 md:pb-28 md:pt-24">
+            <div className="md:col-span-8">
+              <p className="eyebrow animate-rise">{t("hero.eyebrow")}</p>
+              <h1
+                className="mt-8 animate-rise text-[2.6rem] font-light leading-[1.02] tracking-[-0.025em] sm:text-6xl lg:text-[5.25rem]"
+                style={{ animationDelay: "80ms" }}
+              >
+                {t("hero.headline")}
+              </h1>
+              <p
+                className="mt-8 max-w-[58ch] animate-rise text-lg leading-relaxed text-muted-foreground"
+                style={{ animationDelay: "180ms" }}
+              >
+                {t("description")}
+              </p>
+              <div
+                className="mt-10 flex animate-rise flex-wrap items-center gap-3"
+                style={{ animationDelay: "280ms" }}
+              >
+                <a
+                  href="#contact"
+                  className="group inline-flex h-11 items-center gap-2 bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-signal"
+                >
+                  {t("hire")}
+                  <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+                <a
+                  href="#cases"
+                  className="inline-flex h-11 items-center border border-foreground/80 px-6 text-sm font-medium transition-colors hover:border-signal hover:text-signal"
+                >
+                  {t("nav.cases")}
+                </a>
               </div>
             </div>
 
-            <div className="mx-auto grid items-stretch gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
-              <Suspense fallback={<div>Loading...</div>}>
+            <aside
+              className="animate-rise md:col-span-4 md:pt-2"
+              style={{ animationDelay: "360ms" }}
+            >
+              <div className="flex items-center gap-4 border-y py-4">
+                <img
+                  src="https://github.com/kurobaneshin.png"
+                  width={64}
+                  height={64}
+                  alt="Kurobane"
+                  className="h-16 w-16 object-cover grayscale"
+                />
+                <div className="space-y-1">
+                  <p className="font-display text-lg leading-none">Ícaro Diniz</p>
+                  <p className="eyebrow">{t("hero.location")}</p>
+                  <p className="flex items-center gap-2 font-mono text-xs text-foreground">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal opacity-60" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-signal" />
+                    </span>
+                    {t("hero.available")}
+                  </p>
+                </div>
+              </div>
+              <p className="eyebrow mt-8">{t("hero.statsTitle")}</p>
+              <dl className="mt-4 divide-y border-y">
+                {STATS.map((k) => (
+                  <div key={k} className="grid grid-cols-[5.5rem_1fr] items-baseline gap-4 py-4">
+                    <dt className="font-display text-4xl font-light tabular-nums tracking-tight">
+                      {t(`hero.stats.${k}.value`)}
+                    </dt>
+                    <dd className="text-sm leading-snug">
+                      {t(`hero.stats.${k}.label`)}
+                      <span className="eyebrow mt-1 block">{t(`hero.stats.${k}.source`)}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </aside>
+          </div>
+        </section>
+
+        {/* Cases: the ledger */}
+        <section id="cases" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
+          <SectionHead index={1} title={t("cases.title")} description={t("cases.description")} />
+          <ol className="mt-14 border-b">
+            {CASES.map((c, i) => (
+              <li key={c}>
+                <Reveal delay={i * 0.04}>
+                  <article className="group grid gap-4 border-t py-8 transition-colors hover:bg-card md:grid-cols-12 md:gap-8 md:py-10">
+                    <p className="font-mono text-xs tabular-nums text-muted-foreground transition-colors group-hover:text-signal md:col-span-1">
+                      № {pad(i + 1)}
+                    </p>
+                    <div className="md:col-span-3">
+                      <p className="eyebrow">{t(`cases.${c}.client`)}</p>
+                      <h3 className="mt-2 font-sans text-lg font-medium leading-snug">
+                        {t(`cases.${c}.title`)}
+                      </h3>
+                    </div>
+                    <div className="md:col-span-8">
+                      <p className="font-display text-2xl font-light leading-tight tracking-[-0.01em] sm:text-3xl">
+                        {t(`cases.${c}.metric`)}
+                      </p>
+                      <p className="mt-3 max-w-[64ch] leading-relaxed text-muted-foreground">
+                        {t(`cases.${c}.detail`)}
+                      </p>
+                    </div>
+                  </article>
+                </Reveal>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Projects */}
+        <section id="projects" className="scroll-mt-14 border-y bg-card">
+          <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
+            <SectionHead index={2} title={t("featured.title")} description={t("featured.description")} />
+            <div className="mt-14 grid border-l border-t sm:grid-cols-2 lg:grid-cols-3">
+              <Suspense fallback={<p className="eyebrow p-6">…</p>}>
                 <Await resolve={projectsQuery}>
                   {(projects) =>
-                    projects.map((p) => (
-                      <motion.div
-                        initial="offscreen"
-                        whileInView="onscreen"
-                        viewport={{ once: true, amount: 0.8 }}
+                    [...projects].reverse().map((p, i) => (
+                      <a
                         key={p.id}
+                        href={p.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group flex min-h-[13rem] flex-col border-b border-r p-6 transition-colors hover:bg-background"
                       >
-                        <motion.div
-                          variants={cardVariants}
-                        >
-                          <Link
-                            to={p.link}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="duration-300 group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                          >
-                            <img
-                              src={p.picture}
-                              width={300}
-                              height={200}
-                              alt={p.title}
-                              className="rounded-lg object-cover"
-                            />
-                            <h3 className="text-lg font-bold">{p.title}</h3>
-                            <p className="text-sm">
-                              {p.description}
-                            </p>
-                          </Link>
-                        </motion.div>
-                      </motion.div>
-                    ))}
-                </Await>
-              </Suspense>
-            </div>
-          </div>
-        </section>
-        <section
-          id="skills"
-          className="w-full py-12 md:py-24 lg:py-32 bg-muted"
-        >
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  {t("skills.title")}
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  {t("skills.description")}
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-              <motion.div
-                initial="offscreen"
-                whileInView="onscreen"
-                viewport={{ once: true, amount: 0.8 }}
-                className="grid"
-              >
-                <motion.div
-                  variants={cardVariants}
-                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <FaReact className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">React</h3>
-                  <p className="text-sm ">
-                    {t("skills.react")}
-                  </p>
-                </motion.div>
-              </motion.div>
-              <motion.div
-                initial="offscreen"
-                whileInView="onscreen"
-                viewport={{ once: true, amount: 0.8 }}
-                className="grid"
-              >
-                <motion.div
-                  variants={cardVariants}
-                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <FaNodeJs className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Node.js</h3>
-                  <p className="text-sm ">
-                    {t("skills.node")}
-                  </p>
-                </motion.div>
-              </motion.div>
-              <motion.div
-                initial="offscreen"
-                whileInView="onscreen"
-                viewport={{ once: true, amount: 0.8 }}
-                className="grid"
-              >
-                <motion.div
-                  variants={cardVariants}
-                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <FaGolang className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Go</h3>
-                  <p className="text-sm ">
-                    {t("skills.go")}
-                  </p>
-                </motion.div>
-              </motion.div>
-              <motion.div
-                initial="offscreen"
-                whileInView="onscreen"
-                viewport={{ once: true, amount: 0.8 }}
-                className="grid"
-              >
-                <motion.div
-                  variants={cardVariants}
-                  className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <SiTerraform className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Cloud & IaC</h3>
-                  <p className="text-sm ">
-                    {t("skills.cloud")}
-                  </p>
-                </motion.div>
-              </motion.div>
-
-              <motion.div
-                initial="offscreen"
-                whileInView="onscreen"
-                viewport={{ once: true, amount: 0.8 }}
-                className="grid"
-              >
-                <motion.div
-                  variants={cardVariants}
-                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <SiGooglebigquery className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Data</h3>
-                  <p className="text-sm">
-                    {t("skills.data")}
-                  </p>
-                </motion.div>
-              </motion.div>
-              <motion.div
-                initial="offscreen"
-                whileInView="onscreen"
-                viewport={{ once: true, amount: 0.8 }}
-                className="grid"
-              >
-                <motion.div
-                  variants={cardVariants}
-                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                >
-                  <RiSpeedUpFill className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Performance</h3>
-                  <p className="text-sm">
-                    {t("skills.performance")}
-                  </p>
-                </motion.div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-        <section id="experience" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  {t("exp.title")}
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  {t("exp.description")}
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              <Suspense
-                key="companies"
-                fallback={<div>Loading...</div>}
-              >
-                <Await
-                  resolve={companiesQuery}
-                  errorElement={<div>Error</div>}
-                >
-                  {(companies) =>
-                    companies.map((c) => (
-                      <div
-                        key={c.id}
-                        className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
-                      >
-                        <h3 className="text-lg font-bold">{c.title}</h3>
-                        <p className="text-sm ">
-                          {c.client} | {c.start} - {c.end ?? "Present"}
+                        <div className="flex items-start justify-between">
+                          <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                            {pad(i + 1)}
+                          </span>
+                          <ArrowUpRightIcon className="h-4 w-4 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-signal" />
+                        </div>
+                        <h3 className="mt-8 text-2xl font-light tracking-tight">{p.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          {p.description}
                         </p>
-                        <ul className="list-disc pl-4 text-sm ">
-                          {c.items.map((i, idx) => <li key={idx}>{i}</li>)}
-                        </ul>
-                      </div>
+                        <p className="eyebrow mt-auto pt-6 transition-colors group-hover:text-signal">
+                          {hostOf(p.link)}
+                        </p>
+                      </a>
                     ))}
                 </Await>
               </Suspense>
             </div>
           </div>
         </section>
-        <section
-          id="expertise"
-          className="border-t bg-background py-12 md:py-16 lg:py-20"
-        >
-          <div className="container px-4 md:px-6">
-            <div className="max-w-3xl mx-auto text-center space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                {t("expertise.title")}
+
+        {/* Capabilities */}
+        <section id="skills" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
+          <SectionHead index={3} title={t("skills.title")} description={t("skills.description")} />
+          <div className="mt-14 grid gap-px overflow-hidden border bg-border sm:grid-cols-2 lg:grid-cols-3">
+            {CAPABILITIES.map((c, i) => (
+              <Reveal key={c.key} delay={i * 0.05} className="bg-background">
+                <div className="group h-full p-7">
+                  <div className="flex items-center justify-between">
+                    <c.icon className="h-6 w-6 text-foreground transition-colors group-hover:text-signal" />
+                    <span className="font-mono text-xs tabular-nums text-muted-foreground">{pad(i + 1)}</span>
+                  </div>
+                  <h3 className="mt-10 text-2xl font-light tracking-tight">{c.name}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {t(`skills.${c.key}`)}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* Experience */}
+        <section id="experience" className="scroll-mt-14 border-t bg-card">
+          <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
+            <SectionHead index={4} title={t("exp.title")} description={t("exp.description")} />
+            <ol className="mt-14 border-b">
+              <Suspense fallback={<li className="eyebrow py-6">…</li>}>
+                <Await resolve={companiesQuery} errorElement={<li className="eyebrow py-6">—</li>}>
+                  {(companies) =>
+                    [...companies]
+                      .sort(
+                        (a, b) =>
+                          Number(b.end === null) - Number(a.end === null) ||
+                          (b.end ?? "").localeCompare(a.end ?? "") ||
+                          b.start.localeCompare(a.start),
+                      )
+                      .map((c) => (
+                      <li key={c.id} className="grid gap-4 border-t py-8 md:grid-cols-12 md:gap-8">
+                        <p className="font-mono text-xs tabular-nums text-muted-foreground md:col-span-3">
+                          {yearMonth(c.start)} — {c.end ? yearMonth(c.end) : (
+                            <span className="text-signal">{t("present")}</span>
+                          )}
+                        </p>
+                        <div className="md:col-span-9">
+                          <h3 className="text-2xl font-light leading-tight tracking-tight">{c.client}</h3>
+                          <p className="eyebrow mt-2">{c.title}</p>
+                          {c.items.length > 0 && (
+                            <ul className="mt-5 grid gap-2.5 text-[0.95rem] leading-relaxed text-muted-foreground">
+                              {c.items.map((item, idx) => (
+                                <li key={idx} className="grid grid-cols-[1rem_1fr]">
+                                  <span aria-hidden className="text-signal">–</span>
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                </Await>
+              </Suspense>
+            </ol>
+          </div>
+        </section>
+
+        {/* Stack */}
+        <section id="expertise" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
+          <SectionHead index={5} title={t("expertise.title")} description={t("expertise.description")} />
+          <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {STACK.map((g) => (
+              <Reveal key={g.group}>
+                <div className="flex items-center gap-3 border-b pb-3">
+                  <g.icon className="h-4 w-4 text-signal" />
+                  <h3 className="font-mono text-xs font-medium uppercase tracking-[0.18em]">
+                    {t(`${g.group}.title`)}
+                  </h3>
+                </div>
+                <ul className="divide-y">
+                  {g.items.map((it) => (
+                    <li key={it.name} className="flex items-center gap-3 py-3 text-sm">
+                      <it.icon className="h-4 w-4 text-muted-foreground" />
+                      <span className="capitalize">{t(`${g.group}.${it.name}.name`)}</span>
+                      <span className="ml-auto font-mono text-xs tabular-nums text-muted-foreground">
+                        {t(`${g.group}.${it.name}.experience`)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* Contact */}
+        <section id="contact" className="scroll-mt-14 border-t bg-primary text-primary-foreground">
+          <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-20 md:grid-cols-12 md:px-10 md:py-28">
+            <div className="md:col-span-6">
+              <p className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-primary-foreground/60">
+                <span className="text-signal">§ 06</span>
+              </p>
+              <h2 className="mt-6 text-5xl font-light leading-[1.02] tracking-[-0.025em] lg:text-7xl">
+                {t("touch.title")}
               </h2>
-              <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                {t("expertise.description")}
+              <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-primary-foreground/70">
+                {t("touch.description")}
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <FaLaptopCode className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    {t("languages.title")}
-                  </h3>
-                </div>
-                <div className="grid gap-2 mt-2">
-                  {langs.map((l, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <l.icon className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <p className="capitalize text-muted-foreground">
-                        {t(`languages.${l.name}.name`)} -{" "}
-                        {t(`languages.${l.name}.experience`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+            <Form
+              method="post"
+              id={form.id}
+              onSubmit={form.onSubmit}
+              noValidate
+              className="flex flex-col gap-6 md:col-span-5 md:col-start-8 [&_input]:text-primary-foreground [&_textarea]:text-primary-foreground"
+            >
+              <div>
+                <input
+                  type="text"
+                  placeholder={t("touch.inputs.name")}
+                  autoComplete="name"
+                  className={`${fieldClass} border-primary-foreground/25 placeholder:text-primary-foreground/45`}
+                  key={fields.name.key}
+                  name={fields.name.name}
+                  defaultValue={fields.name.initialValue}
+                />
+                {errorsOf(fields.name.errors)}
               </div>
-              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <FaTv className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    {t("frontends.title")}
-                  </h3>
-                </div>
-                <div className="grid gap-2 mt-2">
-                  {frontends.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <f.icon className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <p className="capitalize text-muted-foreground">
-                        {t(`frontends.${f.name}.name`)} -{" "}
-                        {t(`frontends.${f.name}.experience`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+              <div>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  placeholder={t("touch.inputs.email")}
+                  className={`${fieldClass} border-primary-foreground/25 placeholder:text-primary-foreground/45`}
+                  key={fields.email.key}
+                  name={fields.email.name}
+                  defaultValue={fields.email.initialValue}
+                />
+                {errorsOf(fields.email.errors)}
               </div>
-              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <CodeIcon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    {t("backends.title")}
-                  </h3>
-                </div>
-
-                <div className="grid gap-2 mt-2">
-                  {backends.map((b, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <b.icon className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <p className="capitalize text-muted-foreground">
-                        {t(`backends.${b.name}.name`)} -{" "}
-                        {t(`backends.${b.name}.experience`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+              <div>
+                <textarea
+                  rows={4}
+                  placeholder={t("touch.inputs.message")}
+                  className={`${fieldClass} resize-none border-primary-foreground/25 placeholder:text-primary-foreground/45`}
+                  key={fields.message.key}
+                  name={fields.message.name}
+                  defaultValue={fields.message.initialValue}
+                />
+                {errorsOf(fields.message.errors)}
               </div>
-              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <IoLibrarySharp className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    {t("libraries.title")}
-                  </h3>
-                </div>
-                <div className="grid gap-2 mt-2">
-                  {libraries.map((l, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <l.icon className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <p className="capitalize text-muted-foreground">
-                        {t(`libraries.${l.name}.name`)} -{" "}
-                        {t(`libraries.${l.name}.experience`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <GrTools className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Tools</h3>
-                </div>
-                <div className="grid gap-2 mt-2">
-                  {tools.map((tool, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <tool.icon className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <p className="capitalize text-muted-foreground">
-                        {t(`tools.${tool.name}.name`)} -{" "}
-                        {t(`tools.${tool.name}.experience`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary rounded-md p-3 flex items-center justify-center">
-                    <FaDatabase className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Databases</h3>
-                </div>
-                <div className="grid gap-2 mt-2">
-                  {databases.map((db, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="bg-primary rounded-md p-2 flex items-center justify-center">
-                        <db.icon className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <p className="capitalize text-muted-foreground">
-                        {t(`databases.${db.name}.name`)} -{" "}
-                        {t(`databases.${db.name}.experience`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section
-          id="contact"
-          className="w-full py-12 md:py-24 lg:py-32 bg-muted"
-        >
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  {t("touch.title")}
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  {t("touch.description")}
-                </p>
-              </div>
-              <div className="mx-auto w-full max-w-sm space-y-2">
-                <Form
-                  method="post"
-                  id={form.id}
-                  onSubmit={form.onSubmit}
-                  noValidate
-                  className="flex flex-col gap-2"
-                >
-                  <Input
-                    type="text"
-                    placeholder={t("touch.inputs.name")}
-                    autoComplete="name"
-                    className="max-w-lg flex-1"
-                    key={fields.name.key}
-                    name={fields.name.name}
-                    defaultValue={fields.name.initialValue}
-                  />
-                  {fields.name.errors?.map((e) => (
-                    <div
-                      className="self-start text-red-500 text-sm flex items-center"
-                      key={e}
-                    >
-                      <XIcon />
-                      <p>{t(`validations.${e}`)}</p>
-                    </div>
-                  ))}
-                  <Input
-                    type="email"
-                    autoComplete="email"
-                    placeholder={t("touch.inputs.email")}
-                    className="max-w-lg flex-1"
-                    key={fields.email.key}
-                    name={fields.email.name}
-                    defaultValue={fields.email.initialValue}
-                  />
-                  {fields.email.errors?.map((e) => (
-                    <div
-                      className="self-start text-red-500 text-sm flex items-center"
-                      key={e}
-                    >
-                      <XIcon />
-                      <p>{t(`validations.${e}`)}</p>
-                    </div>
-                  ))}
-                  <Textarea
-                    placeholder={t("touch.inputs.message")}
-                    className="max-w-lg flex-1"
-                    key={fields.message.key}
-                    name={fields.message.name}
-                    defaultValue={fields.message.initialValue}
-                  />
-                  {fields.message.errors?.map((e) => (
-                    <div
-                      className="self-start text-red-500 text-sm flex items-center"
-                      key={e}
-                    >
-                      <XIcon />
-                      <p>{t(`validations.${e}`)}</p>
-                    </div>
-                  ))}
-                  <Button type="submit">{t("touch.inputs.submit")}</Button>
-                </Form>
-              </div>
-            </div>
+              <button
+                type="submit"
+                className="group mt-2 inline-flex h-12 items-center justify-between bg-primary-foreground px-6 text-sm font-medium text-primary transition-colors hover:bg-signal hover:text-primary-foreground"
+              >
+                {t("touch.inputs.submit")}
+                <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </button>
+            </Form>
           </div>
         </section>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Kurobane. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link to="#" className="text-xs hover:underline underline-offset-4">
-            Privacy
-          </Link>
-          <Link to="#" className="text-xs hover:underline underline-offset-4">
-            Terms
-          </Link>
-        </nav>
+
+      <footer className="border-t">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-5 py-6 sm:flex-row sm:items-center md:px-10">
+          <p className="eyebrow">
+            © {new Date().getFullYear()} Kurobane
+          </p>
+          <a
+            href="https://github.com/KurobaneShin"
+            target="_blank"
+            rel="noreferrer"
+            className="eyebrow transition-colors hover:text-signal sm:ml-auto"
+          >
+            github.com/KurobaneShin ↗
+          </a>
+        </div>
       </footer>
     </div>
   );
