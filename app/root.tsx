@@ -1,6 +1,6 @@
 import {
   LinksFunction,
-  unstable_defineLoader as defineLoader,
+  LoaderFunctionArgs,
 } from "@vercel/remix";
 import {
   json,
@@ -36,10 +36,10 @@ export const links: LinksFunction = () => [
     type: "image/png",
   },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  { rel: "preconnect", href: "https://fonts.gstatic.com" },
+  { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
   {
     href:
-      "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap",
+      "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&family=Schibsted+Grotesk:wght@400..600&display=swap",
     rel: "stylesheet",
   },
   {
@@ -51,7 +51,7 @@ export const links: LinksFunction = () => [
 
 export const handle = { i18n: ["translation"] };
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { getTheme } = await themeSessionResolver(request);
   const locale = await i18nServer.getLocale(request);
   const { toast, headers } = await getToast(request);
@@ -72,7 +72,7 @@ export const loader = defineLoader(async ({ request }) => {
       headers,
     },
   );
-});
+};
 // All routes will inherit this configuration,
 // unless a route overrides the config option
 export const config = {

@@ -7,6 +7,7 @@ import { installGlobals } from "@remix-run/node";
 
 const ReactCompilerConfig = {
   compilationMode: "annotation",
+  target: "18",
 };
 
 installGlobals({ nativeFetch: true });
@@ -19,7 +20,7 @@ export default defineConfig({
     remix({
       presets: [vercelPreset()],
       future: {
-        unstable_singleFetch: true,
+        v3_singleFetch: true,
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
@@ -37,3 +38,9 @@ export default defineConfig({
     }),
   ],
 });
+
+declare module "@remix-run/node" {
+  interface Future {
+    v3_singleFetch: true;
+  }
+}

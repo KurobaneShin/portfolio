@@ -19,10 +19,12 @@ const config = {
     },
     extend: {
       fontFamily: {
-        heading: ["var(--font-heading)", ...fontFamily.mono],
-        body: ["var(--font-body)", ...fontFamily.mono],
+        display: ["Newsreader", ...fontFamily.serif],
+        sans: ["'Schibsted Grotesk'", ...fontFamily.sans],
+        mono: ["'IBM Plex Mono'", ...fontFamily.mono],
       },
       colors: {
+        signal: "hsl(var(--signal))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -63,6 +65,10 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        rise: {
+          from: { opacity: "0", transform: "translateY(14px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -73,6 +79,7 @@ const config = {
         },
       },
       animation: {
+        rise: "rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

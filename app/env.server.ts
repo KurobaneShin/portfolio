@@ -19,7 +19,8 @@ export function init() {
   const parsed = schema.safeParse(process.env);
 
   if (parsed.success === false) {
-    throw new Error("Invalid environment variables");
+    const keys = [...new Set(parsed.error.issues.map((i) => i.path.join(".")))];
+    throw new Error(`Invalid environment variables: ${keys.join(", ")}`);
   }
 }
 
