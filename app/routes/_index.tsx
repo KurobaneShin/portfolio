@@ -2,8 +2,8 @@ import {
   HeadersFunction,
   LinksFunction,
   MetaFunction,
-  unstable_defineAction as defineAction,
-  unstable_defineLoader as defineLoader,
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
 } from "@vercel/remix";
 import { motion, useScroll, useSpring, Variants } from "framer-motion";
 import { parseWithZod } from "@conform-to/zod";
@@ -46,10 +46,10 @@ import { cachified } from "~/modules/cache.server";
 import { Suspense } from "react";
 import { FaDatabase, FaDocker, FaLaptopCode, FaNodeJs, FaReact, FaVuejs } from "react-icons/fa";
 import { FaGolang, FaTv } from "react-icons/fa6";
-import { SiExpress, SiHiveBlockchain, SiKubernetes, SiMongodb, SiPrisma, SiRedis, SiSolidity, SiTrpc, SiTypeorm, SiTypescript } from "react-icons/si";
+import { SiExpress, SiGooglebigquery, SiKubernetes, SiMongodb, SiPrisma, SiRedis, SiTerraform, SiTrpc, SiTypeorm, SiTypescript } from "react-icons/si";
 import { IoLogoJavascript } from "react-icons/io";
 import { DiPhp } from "react-icons/di";
-import { RiNextjsFill, RiRemixRunFill, RiTailwindCssFill } from "react-icons/ri";
+import { RiNextjsFill, RiRemixRunFill, RiSpeedUpFill, RiTailwindCssFill } from "react-icons/ri";
 import { BiLogoPostgresql } from "react-icons/bi";
 import { GrMysql, GrTools } from "react-icons/gr";
 import { IoLibrarySharp } from "react-icons/io5";
@@ -91,7 +91,7 @@ export const headers: HeadersFunction = () => {
   };
 };
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const [t, locale] = await Promise.all([
     i18nServer.getFixedT(request),
     i18nServer.getLocale(request),
@@ -141,9 +141,9 @@ export const loader = defineLoader(async ({ request }) => {
     projectsQuery: projectsQuery(),
     companiesQuery: companiesQuery(),
   };
-});
+};
 
-export const action = defineAction(async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: contactSchema });
 
@@ -185,7 +185,7 @@ export const action = defineAction(async ({ request }) => {
     {},
     { message: "Email sent", description: "tank you for contacting me" },
   );
-});
+};
 
 export default function Index() {
   const { t } = useTranslation();
@@ -322,10 +322,23 @@ export default function Index() {
     },
   ];
 
+  const cases = [
+    "globo",
+    "sharecare",
+    "cloudkitchens",
+    "minhasinscricoes",
+    "jveiga",
+    "confiou",
+  ];
+
   const navItens = [
     {
       link: "#hero",
       name: t("nav.about"),
+    },
+    {
+      link: "#cases",
+      name: t("nav.cases"),
     },
     {
       link: "#projects",
@@ -453,6 +466,47 @@ export default function Index() {
                   className="mx-auto aspect-square overflow-hidden rounded-xl obect-cover"
                 />
               </div>
+            </div>
+          </div>
+        </section>
+        <section id="cases" className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+          <div className="container space-y-12 px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                  {t("cases.title")}
+                </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  {t("cases.description")}
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {cases.map((c) => (
+                <motion.div
+                  initial="offscreen"
+                  whileInView="onscreen"
+                  viewport={{ once: true, amount: 0.5 }}
+                  className="grid"
+                  key={c}
+                >
+                  <motion.article
+                    variants={cardVariants}
+                    className="flex flex-col gap-2 rounded-lg bg-background p-5 shadow-sm"
+                  >
+                    <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      {t(`cases.${c}.client`)}
+                    </p>
+                    <h3 className="text-lg font-bold">{t(`cases.${c}.title`)}</h3>
+                    <p className="text-base font-semibold leading-snug">
+                      {t(`cases.${c}.metric`)}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {t(`cases.${c}.detail`)}
+                    </p>
+                  </motion.article>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -586,10 +640,10 @@ export default function Index() {
                   variants={cardVariants}
                   className="group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <SiHiveBlockchain className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Blockchain</h3>
+                  <SiTerraform className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Cloud & IaC</h3>
                   <p className="text-sm ">
-                    {t("skills.blockchain")}
+                    {t("skills.cloud")}
                   </p>
                 </motion.div>
               </motion.div>
@@ -604,10 +658,27 @@ export default function Index() {
                   variants={cardVariants}
                   className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
                 >
-                  <SiSolidity className="h-12 w-12" />
-                  <h3 className="text-lg font-bold">Solidity</h3>
+                  <SiGooglebigquery className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Data</h3>
                   <p className="text-sm">
-                    {t("skills.solidity")}
+                    {t("skills.data")}
+                  </p>
+                </motion.div>
+              </motion.div>
+              <motion.div
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.8 }}
+                className="grid"
+              >
+                <motion.div
+                  variants={cardVariants}
+                  className=" group grid gap-1 rounded-lg bg-background p-4 shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+                >
+                  <RiSpeedUpFill className="h-12 w-12" />
+                  <h3 className="text-lg font-bold">Performance</h3>
+                  <p className="text-sm">
+                    {t("skills.performance")}
                   </p>
                 </motion.div>
               </motion.div>
@@ -890,7 +961,7 @@ export default function Index() {
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">
-          &copy; 2024 Kurobane. All rights reserved.
+          &copy; {new Date().getFullYear()} Kurobane. All rights reserved.
         </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link to="#" className="text-xs hover:underline underline-offset-4">
