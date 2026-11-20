@@ -6,11 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Theme, useTheme } from "remix-themes";
+import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 
 export function ModeToggle() {
-  const [, setTheme] = useTheme();
+  const { setTheme } = useTheme();
   const { t } = useTranslation();
   return (
     <DropdownMenu>
@@ -22,10 +22,10 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme(Theme.LIGHT)}>
+        <DropdownMenuItem onClick={() => setTheme("light")}>
           {t("modeToggle.light")}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme(Theme.DARK)}>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
           {t("modeToggle.dark")}
         </DropdownMenuItem>
       </DropdownMenuContent>

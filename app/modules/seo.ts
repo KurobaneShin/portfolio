@@ -1,15 +1,12 @@
-import { LoaderFunction, MetaArgs, MetaDescriptor } from "@vercel/remix";
+// "<" is escaped so a title can never close the script tag.
+export const ldJson = (data: unknown) => ({ type: "application/ld+json", children: JSON.stringify(data).replace(/</g, "\u003c") });
+
+type Tag = Record<string, string>;
 
 // inspo by https://github.com/chaance/remix-seo/blob/main/src/index.ts
-export interface DefaultMeta<
-  T,
-  U extends Record<string, LoaderFunction | unknown>,
-> {
-  (args: MetaArgs<T, U>, props?: MetaProps): MetaDescriptor[];
-}
-
 export const getMeta = (props: MetaProps) => {
-  const meta: MetaDescriptor[] = [];
+  const meta: Tag[] = [];
+  const links: Tag[] = [];
   const { canonical, title, description, robots, facebook, openGraph } = props;
 
   meta.push({ name: "robots", content: robots || "index, follow" });
@@ -20,7 +17,7 @@ export const getMeta = (props: MetaProps) => {
     meta.push({ name: "description", content: description });
   }
   if (canonical) {
-    meta.push({ tagName: "link", rel: "canonical", href: canonical });
+    links.push({ rel: "canonical", href: canonical });
   }
   if (facebook) {
     if (facebook.appId) {
@@ -28,16 +25,16 @@ export const getMeta = (props: MetaProps) => {
     }
   }
   if (openGraph?.title || title) {
-    meta.push({ property: "og:title", content: openGraph?.title || title });
+    meta.push({ property: "og:title", content: (openGraph?.title || title)! });
   }
   if (openGraph?.description || description) {
     meta.push({
       property: "og:description",
-      content: openGraph?.description || description,
+      content: (openGraph?.description || description)!,
     });
   }
   if (openGraph?.url || canonical) {
-    meta.push({ property: "og:url", content: openGraph?.url || canonical });
+    meta.push({ property: "og:url", content: (openGraph?.url || canonical)! });
   }
   meta.push({ property: "og:type", content: openGraph?.type || "website" });
   meta.push({ property: "og:locale", content: openGraph?.locale || "pt_BR" });
@@ -79,7 +76,7 @@ export const getMeta = (props: MetaProps) => {
   }
   if (openGraph?.videos?.length) {
     for (const video of openGraph.videos) {
-      meta.push({ property: "og:video", content: video.url });
+      meta.push({ property: "og:video", content: video.url! });
       if (video.alt) {
         meta.push({ property: "og:video:alt", content: video.alt });
       }
@@ -107,7 +104,7 @@ export const getMeta = (props: MetaProps) => {
     }
   }
 
-  return meta;
+  return { meta, links };
 };
 
 interface MetaProps {

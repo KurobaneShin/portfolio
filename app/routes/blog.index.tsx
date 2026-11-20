@@ -1,48 +1,53 @@
-import { HeadersFunction, LoaderFunctionArgs, MetaFunction } from "@vercel/remix";
-import { Link, useLoaderData } from "@remix-run/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BlogShell } from "~/components/custom/BlogShell";
-import { asLocale, listPosts } from "~/modules/blog.server";
-import i18nServer from "~/modules/i18n.server";
+import { getBlogIndex } from "~/modules/blog.functions";
+import { getT } from "~/modules/i18n";
 import { getMeta } from "~/modules/seo";
 import { AVATAR_URL, ogLocale } from "~/modules/person";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const [locale, t] = await Promise.all([i18nServer.getLocale(request), i18nServer.getFixedT(request)]);
-  return {
-    locale: asLocale(locale),
-    posts: listPosts(asLocale(locale)),
-    title: t("blog.title"),
-    description: t("blog.description"),
-    origin: new URL(request.url).origin,
-  };
-};
-
-export const headers: HeadersFunction = () => ({
-  "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
-  "CDN-Cache-Control": "public, s-maxage=60",
-  "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
-});
-
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data) return [];
-  const url = `${data.origin}/blog`;
-  return [
-    ...getMeta({
+export const Route = createFileRoute("/blog/")({
+  loaderDeps: ({ search }) => ({ lng: search.lng }),
+  loader: async ({ context: { locale } }) => {
+    const t = getT(locale);
+    return {
+      locale,
+      ...(await getBlogIndex({ data: locale })),
+      title: t("blog.title"),
+      description: t("blog.description"),
+    };
+  },
+  headers: () => ({
+    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
+    "CDN-Cache-Control": "public, s-maxage=60",
+    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
+    Vary: "Cookie",
+  }),
+  head: ({ loaderData: data }) => {
+    if (!data) return {};
+    const url = `${data.origin}/blog`;
+    const { meta, links } = getMeta({
       title: `${data.title} · Kurobane`,
       description: data.description,
       canonical: `${url}?lng=${data.locale}`,
       openGraph: { type: "website", locale: ogLocale(data.locale), siteName: "Kurobane (Icaro)", images: [{ url: AVATAR_URL }] },
-    }),
-    { tagName: "link", rel: "alternate", hrefLang: "pt-BR", href: `${url}?lng=ptBR` },
-    { tagName: "link", rel: "alternate", hrefLang: "en", href: `${url}?lng=en` },
-    { tagName: "link", rel: "alternate", hrefLang: "x-default", href: `${url}?lng=en` },
-    { tagName: "link", rel: "alternate", type: "application/rss+xml", title: "Kurobane · Blog", href: `${data.origin}/blog/rss.xml?lng=${data.locale}` },
-  ];
-};
+    });
+    return {
+      meta,
+      links: [
+        ...links,
+        { rel: "alternate", hrefLang: "pt-BR", href: `${url}?lng=ptBR` },
+        { rel: "alternate", hrefLang: "en", href: `${url}?lng=en` },
+        { rel: "alternate", hrefLang: "x-default", href: `${url}?lng=en` },
+        { rel: "alternate", type: "application/rss+xml", title: "Kurobane · Blog", href: `${data.origin}/blog/rss.xml?lng=${data.locale}` },
+      ],
+    };
+  },
+  component: BlogIndex,
+});
 
-export default function BlogIndex() {
-  const { posts, title, description } = useLoaderData<typeof loader>();
+function BlogIndex() {
+  const { posts, title, description } = Route.useLoaderData();
   const { t } = useTranslation();
   return (
     <BlogShell>
@@ -53,7 +58,7 @@ export default function BlogIndex() {
         <ol className="mt-14 divide-y border-y">
           {posts.map((p) => (
             <li key={p.slug}>
-              <Link to={`/blog/${p.slug}?lng=${p.locale}`} className="group block py-8">
+              <Link to="/blog/$slug" params={{ slug: p.slug }} search={{ lng: p.locale }} className="group block py-8">
                 <p className="flex gap-3 font-mono text-xs tabular-nums text-muted-foreground">
                   <span>{p.date}</span>
                   <span className="uppercase tracking-[0.18em] group-hover:text-signal">{t(`blog.tags.${p.tag}`)}</span>

@@ -1,21 +1,11 @@
-import {
-  HeadersFunction,
-  LinksFunction,
-  MetaFunction,
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-} from "@vercel/remix";
+import { createFileRoute, Await, CatchBoundary } from "@tanstack/react-router";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { parseWithZod } from "@conform-to/zod";
-import {
-  Await,
-  Form,
-  json,
-  useActionData,
-  useLoaderData,
-} from "@remix-run/react";
+import { parseWithZod } from "@conform-to/zod/v4";
+import { type SubmissionResult, useForm } from "@conform-to/react";
 import { ArrowUpRightIcon, MenuIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import type { z } from "zod";
 import { LangChooser } from "~/components/custom/LangChooser";
 import { ModeToggle } from "~/components/custom/ModeToggle";
 import {
@@ -24,16 +14,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import i18nServer from "~/modules/i18n.server";
-import { resend } from "~/modules/resend.server";
-import { z } from "zod";
-import { useForm } from "@conform-to/react";
-import { getMeta } from "~/modules/seo";
+import { contactSchema } from "~/modules/contact";
+import { sendContact } from "~/modules/contact.functions";
+import { getCompanies, getProjects } from "~/modules/home.functions";
+import { getT } from "~/modules/i18n";
+import { getMeta, ldJson } from "~/modules/seo";
 import { ogLocale, person } from "~/modules/person";
-import { supabase } from "~/modules/supabase.server";
-import { jsonWithError, jsonWithSuccess } from "remix-toast";
-import { cachified } from "~/modules/cache.server";
-import { ReactNode, Suspense } from "react";
+import { ReactNode, useState } from "react";
 import { FaDatabase, FaDocker, FaLaptopCode, FaNodeJs, FaReact, FaVuejs } from "react-icons/fa";
 import { FaGolang, FaTv } from "react-icons/fa6";
 import { SiExpress, SiGooglebigquery, SiKubernetes, SiMongodb, SiPrisma, SiRedis, SiTerraform, SiTrpc, SiTypeorm, SiTypescript } from "react-icons/si";
@@ -45,148 +32,51 @@ import { GrMysql, GrTools } from "react-icons/gr";
 import { IoLibrarySharp } from "react-icons/io5";
 import { IconType } from "react-icons";
 
-export const links: LinksFunction = () => [
-  { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
-  {
-    rel: "preload",
-    href: "https://avatars.githubusercontent.com/u/47834261?v=4",
-    as: "image",
-  },
-];
-
-export const meta: MetaFunction<typeof loader> = ({ data, matches }) => {
-  const locale = (matches.find((m) => m.id === "root")?.data as { locale?: string } | undefined)?.locale ?? "en";
-  const origin = "https://portfolio-kurobanes-projects.vercel.app";
-  return [
-    ...getMeta({
+export const Route = createFileRoute("/")({
+  loaderDeps: ({ search }) => ({ lng: search.lng }),
+  loader: ({ context: { locale } }) => ({
+    locale,
+    description: getT(locale)("description"),
+    projectsQuery: getProjects({ data: locale }),
+    companiesQuery: getCompanies({ data: locale }),
+  }),
+  headers: () => ({
+    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
+    "CDN-Cache-Control": "public, s-maxage=60",
+    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
+    Vary: "Cookie",
+  }),
+  head: ({ loaderData }) => {
+    const origin = "https://portfolio-kurobanes-projects.vercel.app";
+    const { meta, links } = getMeta({
       title: "Kurobane (Icaro)",
-      description: data?.description,
+      description: loaderData?.description,
       canonical: origin,
       openGraph: {
         type: "website",
-        locale: ogLocale(locale),
+        locale: ogLocale(loaderData?.locale ?? "en"),
         siteName: "Kurobane (Icaro)",
         images: [{
           url: "https://github.com/kurobaneshin.png",
         }],
       },
-    }),
-    { "script:ld+json": { "@context": "https://schema.org", ...person(origin) } },
-  ];
-};
-
-const contactSchema = z.object({
-  email: z.string({ message: "required" }).email({ message: "email" }),
-  message: z.string({ message: "required" }),
-  name: z.string({ message: "required" }),
+    });
+    return {
+      meta,
+      links: [
+        ...links,
+        { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
+        {
+          rel: "preload",
+          href: "https://avatars.githubusercontent.com/u/47834261?v=4",
+          as: "image",
+        },
+      ],
+      scripts: [ldJson({ "@context": "https://schema.org", ...person(origin) })],
+    };
+  },
+  component: Index,
 });
-
-export const headers: HeadersFunction = () => {
-  return {
-    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
-    "CDN-Cache-Control": "public, s-maxage=60",
-    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
-  };
-};
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const [t, locale] = await Promise.all([
-    i18nServer.getFixedT(request),
-    i18nServer.getLocale(request),
-  ]);
-
-  const projectsQuery = async () => {
-    const data = await cachified({
-      key: `projects-${locale}`,
-      ttl: 1000 * 60 * 60 * 24,
-      async getFreshValue() {
-        const res = await supabase.from("projects")
-          .select("*").eq("lang", locale);
-
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return res.data;
-      },
-    });
-    return data;
-  };
-
-  const companiesQuery = async () => {
-    const data = await cachified({
-      key: `companies-${locale}`,
-      ttl: 1000 * 60 * 60 * 24,
-      async getFreshValue() {
-        const res = await supabase.from("companies").select("*").eq(
-          "lang",
-          locale,
-        ).order("end", {
-          nullsFirst: true,
-          ascending: false,
-        });
-
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return res.data;
-      },
-    });
-    return data;
-  };
-
-  return {
-    description: t("description"),
-    projectsQuery: projectsQuery(),
-    companiesQuery: companiesQuery(),
-  };
-};
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: contactSchema });
-
-  if (submission.status !== "success") {
-    return json(submission.reply());
-  }
-
-  const { name, email, message } = submission.value;
-
-  const from = "kurobane@peropero.site";
-  const to = process.env.NODE_ENV !== "production"
-    ? "delivered@resend.dev"
-    : "icarofdiniz@gmail.com";
-
-  const esc = (s: string) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-
-  const { error } = await resend.emails.send({
-    from,
-    to: [
-      to,
-    ],
-    subject: "hire",
-    html: `
-    <div>
-      <h1>Hi, my name is ${esc(name)}</h1>
-      <p>Email: ${esc(email)}</p>
-      <p>${esc(message)}</p>
-    </div>
-    `,
-  });
-
-  if (error) {
-    console.error("resend", error);
-    return jsonWithError(
-      {},
-      { message: "Email not sent", description: "try again later" },
-    );
-  }
-
-  return jsonWithSuccess(
-    {},
-    { message: "Email sent", description: "tank you for contacting me" },
-  );
-};
 
 const CASES = [
   "globo",
@@ -342,18 +232,24 @@ function SectionHead({
   );
 }
 
-export default function Index() {
+function Index() {
   const { t } = useTranslation();
-  const { projectsQuery, companiesQuery } = useLoaderData<typeof loader>();
+  const { projectsQuery, companiesQuery } = Route.useLoaderData();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
-  const lastResult = useActionData<typeof action>();
-  const [form, fields] = useForm({
+  const [lastResult, setLastResult] = useState<SubmissionResult>();
+  const [form, fields] = useForm<z.infer<typeof contactSchema>>({
     lastResult,
+    async onSubmit(event, { formData }) {
+      event.preventDefault();
+      const res = await sendContact({ data: formData });
+      if (res.reply) setLastResult(res.reply);
+      if (res.toast) toast(res.toast.message, { description: res.toast.description });
+    },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: contactSchema });
     },
@@ -550,8 +446,7 @@ export default function Index() {
           <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
             <SectionHead index={2} title={t("featured.title")} description={t("featured.description")} />
             <div className="mt-14 grid border-l border-t sm:grid-cols-2 lg:grid-cols-3">
-              <Suspense fallback={<p className="eyebrow p-6">…</p>}>
-                <Await resolve={projectsQuery}>
+              <Await promise={projectsQuery} fallback={<p className="eyebrow p-6">…</p>}>
                   {(projects) =>
                     [...projects].reverse().map((p, i) => (
                       <a
@@ -577,7 +472,6 @@ export default function Index() {
                       </a>
                     ))}
                 </Await>
-              </Suspense>
             </div>
           </div>
         </section>
@@ -608,8 +502,8 @@ export default function Index() {
           <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
             <SectionHead index={4} title={t("exp.title")} description={t("exp.description")} />
             <ol className="mt-14 border-b">
-              <Suspense fallback={<li className="eyebrow py-6">…</li>}>
-                <Await resolve={companiesQuery} errorElement={<li className="eyebrow py-6">—</li>}>
+              <CatchBoundary getResetKey={() => "companies"} errorComponent={() => <li className="eyebrow py-6">—</li>}>
+                <Await promise={companiesQuery} fallback={<li className="eyebrow py-6">…</li>}>
                   {(companies) =>
                     [...companies]
                       .sort(
@@ -642,7 +536,7 @@ export default function Index() {
                       </li>
                     ))}
                 </Await>
-              </Suspense>
+                </CatchBoundary>
             </ol>
           </div>
         </section>
@@ -689,7 +583,7 @@ export default function Index() {
                 {t("touch.description")}
               </p>
             </div>
-            <Form
+            <form
               method="post"
               id={form.id}
               onSubmit={form.onSubmit}
@@ -738,7 +632,7 @@ export default function Index() {
                 {t("touch.inputs.submit")}
                 <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </button>
-            </Form>
+            </form>
           </div>
         </section>
       </main>

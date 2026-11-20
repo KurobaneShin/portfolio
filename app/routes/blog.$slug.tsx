@@ -1,35 +1,31 @@
-import { HeadersFunction, LoaderFunctionArgs, MetaFunction } from "@vercel/remix";
-import { Link, useLoaderData } from "@remix-run/react";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BlogShell } from "~/components/custom/BlogShell";
-import { asLocale, getPost, localesOf } from "~/modules/blog.server";
-import i18nServer from "~/modules/i18n.server";
+import { getBlogPost } from "~/modules/blog.functions";
 import { AVATAR_URL, htmlLang, ogLocale, person } from "~/modules/person";
-import { getMeta } from "~/modules/seo";
+import { getMeta, ldJson } from "~/modules/seo";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const locale = asLocale(await i18nServer.getLocale(request));
-  const post = getPost(params.slug ?? "", locale);
-  if (!post) throw new Response("Not found", { status: 404 });
-  const origin = new URL(request.url).origin;
-  return { post, origin, locales: localesOf(post.slug) };
-};
-
-export const headers: HeadersFunction = () => ({
-  "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
-  "CDN-Cache-Control": "public, s-maxage=60",
-  "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
-});
-
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data) return [{ title: "Not found" }];
-  const { post, origin, locales } = data;
-  const url = `${origin}/blog/${post.slug}`;
-  const canonical = `${url}?lng=${post.locale}`;
-  const image = post.image ?? post.cover;
-  const imageUrl = image ? origin + image : AVATAR_URL;
-  return [
-    ...getMeta({
+export const Route = createFileRoute("/blog/$slug")({
+  loaderDeps: ({ search }) => ({ lng: search.lng }),
+  loader: async ({ params, context: { locale } }) => {
+    const data = await getBlogPost({ data: { slug: params.slug, locale } });
+    if (!data) throw notFound();
+    return data;
+  },
+  headers: () => ({
+    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
+    "CDN-Cache-Control": "public, s-maxage=60",
+    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
+    Vary: "Cookie",
+  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [{ title: "Not found" }] };
+    const { post, origin, locales } = loaderData;
+    const url = `${origin}/blog/${post.slug}`;
+    const canonical = `${url}?lng=${post.locale}`;
+    const image = post.image ?? post.cover;
+    const imageUrl = image ? origin + image : AVATAR_URL;
+    const { meta, links } = getMeta({
       title: `${post.title} · Kurobane`,
       description: post.description,
       canonical,
@@ -39,34 +35,43 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
         siteName: "Kurobane (Icaro)",
         images: [post.image ? { url: imageUrl, width: 1200, height: 630, alt: post.title } : { url: imageUrl }],
       },
-    }),
-    { property: "article:published_time", content: post.date },
-    { name: "twitter:card", content: post.image ? "summary_large_image" : "summary" },
-    ...locales.map((l) => ({ tagName: "link", rel: "alternate", hrefLang: htmlLang(l), href: `${url}?lng=${l}` })),
-    { tagName: "link", rel: "alternate", hrefLang: "x-default", href: `${url}?lng=${locales.includes("en") ? "en" : locales[0]}` },
-    { tagName: "link", rel: "alternate", type: "application/rss+xml", title: "Kurobane · Blog", href: `${origin}/blog/rss.xml?lng=${post.locale}` },
-    {
-      "script:ld+json": {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: post.title,
-        description: post.description,
-        datePublished: post.date,
-        dateModified: post.date,
-        inLanguage: htmlLang(post.locale),
-        url: canonical,
-        mainEntityOfPage: canonical,
-        image: imageUrl,
-        author: person(origin),
-        publisher: person(origin),
-        ...(post.video && { video: { "@type": "VideoObject", name: post.title, description: post.description, contentUrl: origin + post.video, thumbnailUrl: imageUrl, uploadDate: post.date } }),
-      },
-    },
-  ];
-};
+    });
+    return {
+      meta: [
+        ...meta,
+        { property: "article:published_time", content: post.date },
+        { name: "twitter:card", content: post.image ? "summary_large_image" : "summary" },
+      ],
+      links: [
+        ...links,
+        ...locales.map((l) => ({ rel: "alternate", hrefLang: htmlLang(l), href: `${url}?lng=${l}` })),
+        { rel: "alternate", hrefLang: "x-default", href: `${url}?lng=${locales.includes("en") ? "en" : locales[0]}` },
+        { rel: "alternate", type: "application/rss+xml", title: "Kurobane · Blog", href: `${origin}/blog/rss.xml?lng=${post.locale}` },
+      ],
+      scripts: [
+        ldJson({
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.description,
+          datePublished: post.date,
+          dateModified: post.date,
+          inLanguage: htmlLang(post.locale),
+          url: canonical,
+          mainEntityOfPage: canonical,
+          image: imageUrl,
+          author: person(origin),
+          publisher: person(origin),
+          ...(post.video && { video: { "@type": "VideoObject", name: post.title, description: post.description, contentUrl: origin + post.video, thumbnailUrl: imageUrl, uploadDate: post.date } }),
+        }),
+      ],
+    };
+  },
+  component: BlogPost,
+});
 
-export default function BlogPost() {
-  const { post } = useLoaderData<typeof loader>();
+function BlogPost() {
+  const { post } = Route.useLoaderData();
   const { t } = useTranslation();
   return (
     <BlogShell>
@@ -95,7 +100,7 @@ export default function BlogPost() {
               {t("blog.discuss")} ↗
             </a>
           )}
-          <Link to="/#contact" className="eyebrow transition-colors hover:text-signal">{t("blog.cta")} ↗</Link>
+          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal">{t("blog.cta")} ↗</Link>
         </div>
       </article>
     </BlogShell>

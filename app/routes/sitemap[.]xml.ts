@@ -1,8 +1,9 @@
-import type { LoaderFunctionArgs } from "@vercel/remix";
+import { createFileRoute } from "@tanstack/react-router";
 import { listSlugs } from "~/modules/blog.server";
+import { originOf } from "~/modules/origin.server";
 
-export const loader = ({ request }: LoaderFunctionArgs) => {
-  const origin = new URL(request.url).origin;
+const sitemap = (request: Request) => {
+  const origin = originOf(request);
   const paths = [
     "/",
     "/blog",
@@ -21,3 +22,7 @@ ${urls}
     },
   });
 };
+
+export const Route = createFileRoute("/sitemap.xml")({
+  server: { handlers: { GET: ({ request }) => sitemap(request) } },
+});

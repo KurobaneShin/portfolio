@@ -1,15 +1,14 @@
-import { useRouteLoaderData } from "@remix-run/react";
+import { useTheme } from "next-themes";
 import { Toaster as Sonner } from "sonner";
-import { loader } from "~/root";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const data = useRouteLoaderData<typeof loader>("root");
+  const { theme } = useTheme();
 
   return (
     <Sonner
-      theme={data?.theme as unknown as ToasterProps["theme"]}
+      theme={theme as ToasterProps["theme"]}
       className="toaster group"
       toastOptions={{
         classNames: {

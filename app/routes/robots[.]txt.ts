@@ -1,7 +1,8 @@
-import type { LoaderFunctionArgs } from "@vercel/remix";
+import { createFileRoute } from "@tanstack/react-router";
+import { originOf } from "~/modules/origin.server";
 
-export const loader = ({ request }: LoaderFunctionArgs) => {
-  const origin = new URL(request.url).origin;
+const robots = (request: Request) => {
+  const origin = originOf(request);
   return new Response(`User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
@@ -9,3 +10,7 @@ export const loader = ({ request }: LoaderFunctionArgs) => {
     },
   });
 };
+
+export const Route = createFileRoute("/robots.txt")({
+  server: { handlers: { GET: ({ request }) => robots(request) } },
+});
