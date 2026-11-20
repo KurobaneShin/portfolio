@@ -3,6 +3,7 @@ title: Quem manda no jogo, o seu PC ou o servidor?
 description: Por que editar o HP na memória às vezes não dava em nada. O que é um tick, por que o meu servidor roda 30 por segundo e quanto custa cada rodada.
 date: 2026-11-24
 tag: mmo
+image: /blog/quem-manda-no-jogo/og-pt.jpg
 cover: /blog/quem-manda-no-jogo/cover-pt.jpg
 video: /blog/quem-manda-no-jogo/reel-pt.mp4
 ---

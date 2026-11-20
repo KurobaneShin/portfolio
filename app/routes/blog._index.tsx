@@ -5,14 +5,16 @@ import { BlogShell } from "~/components/custom/BlogShell";
 import { asLocale, listPosts } from "~/modules/blog.server";
 import i18nServer from "~/modules/i18n.server";
 import { getMeta } from "~/modules/seo";
+import { AVATAR_URL, ogLocale } from "~/modules/person";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const [locale, t] = await Promise.all([i18nServer.getLocale(request), i18nServer.getFixedT(request)]);
   return {
+    locale: asLocale(locale),
     posts: listPosts(asLocale(locale)),
     title: t("blog.title"),
     description: t("blog.description"),
-    url: new URL(request.url).origin + "/blog",
+    origin: new URL(request.url).origin,
   };
 };
 
@@ -22,13 +24,22 @@ export const headers: HeadersFunction = () => ({
   "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
 });
 
-export const meta: MetaFunction<typeof loader> = ({ data }) =>
-  getMeta({
-    title: `${data?.title} · Kurobane`,
-    description: data?.description,
-    canonical: data?.url,
-    openGraph: { type: "website", siteName: "Kurobane (Icaro)", images: [{ url: "https://github.com/kurobaneshin.png" }] },
-  });
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
+  const url = `${data.origin}/blog`;
+  return [
+    ...getMeta({
+      title: `${data.title} · Kurobane`,
+      description: data.description,
+      canonical: `${url}?lng=${data.locale}`,
+      openGraph: { type: "website", locale: ogLocale(data.locale), siteName: "Kurobane (Icaro)", images: [{ url: AVATAR_URL }] },
+    }),
+    { tagName: "link", rel: "alternate", hrefLang: "pt-BR", href: `${url}?lng=ptBR` },
+    { tagName: "link", rel: "alternate", hrefLang: "en", href: `${url}?lng=en` },
+    { tagName: "link", rel: "alternate", hrefLang: "x-default", href: `${url}?lng=en` },
+    { tagName: "link", rel: "alternate", type: "application/rss+xml", title: "Kurobane · Blog", href: `${data.origin}/blog/rss.xml?lng=${data.locale}` },
+  ];
+};
 
 export default function BlogIndex() {
   const { posts, title, description } = useLoaderData<typeof loader>();

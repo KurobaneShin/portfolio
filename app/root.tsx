@@ -27,6 +27,7 @@ import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 import { getToast } from "remix-toast";
 import { getEnv } from "./env.server";
+import { htmlLang } from "./modules/person";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesHref },
@@ -92,7 +93,7 @@ export function App() {
   }, [data.toast]);
 
   return (
-    <html lang={data.locale ?? "en"} className={clsx(theme)}>
+    <html lang={htmlLang(data.locale ?? "en")} className={clsx(theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -29,6 +29,7 @@ import { resend } from "~/modules/resend.server";
 import { z } from "zod";
 import { useForm } from "@conform-to/react";
 import { getMeta } from "~/modules/seo";
+import { ogLocale, person } from "~/modules/person";
 import { supabase } from "~/modules/supabase.server";
 import { jsonWithError, jsonWithSuccess } from "remix-toast";
 import { cachified } from "~/modules/cache.server";
@@ -53,19 +54,26 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export const meta: MetaFunction<typeof loader> = ({ data }) =>
-  getMeta({
-    title: "Kurobane (Icaro)",
-    description: data?.description,
-    canonical: "https://portfolio-kurobanes-projects.vercel.app",
-    openGraph: {
-      type: "website",
-      siteName: "Kurobane (Icaro)",
-      images: [{
-        url: "https://github.com/kurobaneshin.png",
-      }],
-    },
-  });
+export const meta: MetaFunction<typeof loader> = ({ data, matches }) => {
+  const locale = (matches.find((m) => m.id === "root")?.data as { locale?: string } | undefined)?.locale ?? "en";
+  const origin = "https://portfolio-kurobanes-projects.vercel.app";
+  return [
+    ...getMeta({
+      title: "Kurobane (Icaro)",
+      description: data?.description,
+      canonical: origin,
+      openGraph: {
+        type: "website",
+        locale: ogLocale(locale),
+        siteName: "Kurobane (Icaro)",
+        images: [{
+          url: "https://github.com/kurobaneshin.png",
+        }],
+      },
+    }),
+    { "script:ld+json": { "@context": "https://schema.org", ...person(origin) } },
+  ];
+};
 
 const contactSchema = z.object({
   email: z.string({ message: "required" }).email({ message: "email" }),

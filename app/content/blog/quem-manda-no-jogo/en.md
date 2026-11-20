@@ -3,6 +3,7 @@ title: Who's in charge of the game, your PC or the server?
 description: Why editing the HP in memory sometimes did nothing. What a tick is, why my server runs 30 per second, and what each round costs.
 date: 2026-11-24
 tag: mmo
+image: /blog/quem-manda-no-jogo/og-en.jpg
 cover: /blog/quem-manda-no-jogo/cover-en.jpg
 video: /blog/quem-manda-no-jogo/reel-en.mp4
 ---

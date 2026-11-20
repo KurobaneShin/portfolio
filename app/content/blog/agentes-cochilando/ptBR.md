@@ -3,6 +3,7 @@ title: Meus agentes de IA passaram 207 horas cochilando
 description: Em 30 dias, meus agentes ficaram parados mais de 5 minutos 600 vezes. 357 delas eram um sleep perguntando "já acabou?". E cada pergunta custava reler um livro inteiro.
 date: 2026-11-25
 tag: ia
+image: /blog/agentes-cochilando/og-pt.jpg
 ---
 Eu uso agente de IA pra quase tudo: rodar teste, revisar PR, e até construir o meu MMO. Um dia fui medir quanto isso custa de verdade e achei um número ridículo.
 

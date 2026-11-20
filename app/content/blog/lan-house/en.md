@@ -3,6 +3,7 @@ title: I once tried to edit an MMO's HP straight in memory
 description: Born in '99, going to LAN centers since I was 4. Now I'm a web dev building an MMO from scratch to understand what I didn't back then.
 date: 2026-11-23
 tag: mmo
+image: /blog/lan-house/og-en.jpg
 ---
 I once tried to edit an MMO's HP straight in memory. At a LAN center in Brazil.
 

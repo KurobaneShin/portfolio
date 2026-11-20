@@ -19,6 +19,8 @@ export type PostMeta = {
   tag: string;
   cover?: string;
   video?: string;
+  image?: string;
+  linkedin?: string;
 };
 
 type Post = PostMeta & { html: string };
@@ -42,6 +44,8 @@ function parse(path: string, raw: string): Post {
     tag: fields.tag,
     cover: fields.cover || undefined,
     video: fields.video || undefined,
+    image: fields.image || undefined,
+    linkedin: fields.linkedin || undefined,
     html: marked.parse(match[2], { async: false }),
   };
 }
@@ -60,6 +64,10 @@ export function listPosts(locale: Locale): PostMeta[] {
     .map((slug) => getPost(slug, locale)!)
     .map(({ html: _html, ...meta }) => meta)
     .sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export function localesOf(slug: string): Locale[] {
+  return posts.filter((p) => p.slug === slug).map((p) => p.locale);
 }
 
 export function listSlugs(): string[] {

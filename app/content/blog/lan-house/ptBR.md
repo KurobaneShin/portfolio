@@ -3,6 +3,7 @@ title: Eu já tentei editar o HP de um MMO direto na memória
 description: Nasci em 99 e ia pra lan house desde os 4 anos. Hoje sou dev web e estou fazendo um MMO do zero pra entender o que eu não entendia naquela época.
 date: 2026-11-23
 tag: mmo
+image: /blog/lan-house/og-pt.jpg
 ---
 Eu já tentei editar o HP de um MMO direto na memória. Na lan house.
 

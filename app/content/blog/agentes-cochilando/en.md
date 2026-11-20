@@ -3,6 +3,7 @@ title: My AI agents spent 207 hours napping
 description: In 30 days my agents sat idle for over 5 minutes 600 times. 357 of those were a sleep asking "done yet?". And every question cost re-reading an entire book.
 date: 2026-11-25
 tag: ia
+image: /blog/agentes-cochilando/og-en.jpg
 ---
 I use AI agents for almost everything: running tests, reviewing PRs, even building my MMO. One day I measured what that actually costs and found a ridiculous number.
 
