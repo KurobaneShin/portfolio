@@ -41,7 +41,7 @@
     "react-icons": "^5.7.0",
     "remix-i18next": "^6.4.1",
     "remix-themes": "^1.6.1",
-    "remix-toast": "^1.2.2",
+    "remix-toast": "^4.0.0",
     "resend": "^3.5.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.2",
