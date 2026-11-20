@@ -30,7 +30,16 @@ export default {
     light: "Claro",
     dark: "Escuro",
   },
+  blog: {
+    title: "Blog",
+    eyebrow: "Anotações da bancada",
+    description: "O que eu aprendo fazendo um MMO do zero, entregando sistemas web e trabalhando com agentes de IA. Com os números e com os erros.",
+    back: "Todos os posts",
+    cta: "Quer esse rigor no seu projeto? Vamos conversar",
+    tags: { mmo: "MMO", web: "Web", ia: "IA" },
+  },
   nav: {
+    blog: "Blog",
     about: "Sobre",
     cases: "Casos",
     projects: "Projetos",

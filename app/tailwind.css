@@ -134,3 +134,42 @@
     );
   }
 }
+
+@layer components {
+  .blog-prose {
+    @apply text-[1.0625rem] leading-relaxed;
+  }
+  .blog-prose > * + * {
+    @apply mt-5;
+  }
+  .blog-prose h2 {
+    @apply mt-12 font-display text-3xl tracking-tight;
+  }
+  .blog-prose h3 {
+    @apply mt-8 font-display text-2xl tracking-tight;
+  }
+  .blog-prose a {
+    @apply text-signal underline underline-offset-4;
+  }
+  .blog-prose ul {
+    @apply list-disc space-y-2 pl-6;
+  }
+  .blog-prose ol {
+    @apply list-decimal space-y-2 pl-6;
+  }
+  .blog-prose blockquote {
+    @apply border-l-2 border-signal pl-5 italic text-muted-foreground;
+  }
+  .blog-prose code {
+    @apply bg-muted px-1 py-0.5 font-mono text-[0.9em];
+  }
+  .blog-prose pre {
+    @apply overflow-x-auto border bg-card p-4 font-mono text-sm leading-relaxed;
+  }
+  .blog-prose pre code {
+    @apply bg-transparent p-0;
+  }
+  .blog-prose img {
+    @apply w-full border;
+  }
+}

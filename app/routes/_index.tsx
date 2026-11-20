@@ -357,6 +357,7 @@ export default function Index() {
     { link: "#experience", name: t("nav.exp") },
     { link: "#expertise", name: t("nav.expertise") },
     { link: "#contact", name: t("nav.contact") },
+    { link: "/blog", name: t("nav.blog") },
   ];
 
   const fieldClass =
