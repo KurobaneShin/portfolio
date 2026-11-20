@@ -1,5 +1,8 @@
-// "<" is escaped so a title can never close the script tag.
-export const ldJson = (data: unknown) => ({ type: "application/ld+json", children: JSON.stringify(data).replace(/</g, "\u003c") });
+// Inline-script safe JSON: "<" (could close the tag) and U+2028/U+2029 are written as JSON escapes.
+export const safeJson = (data: unknown) =>
+  JSON.stringify(data).replace(/[<\u2028\u2029]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+
+export const ldJson = (data: unknown) => ({ type: "application/ld+json", children: safeJson(data) });
 
 type Tag = Record<string, string>;
 

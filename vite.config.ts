@@ -5,5 +5,5 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
-  plugins: [tanstackStart({ srcDirectory: "app" }), nitro(), viteReact()],
+  plugins: [tanstackStart({ srcDirectory: "app" }), nitro({ preset: "node-server" }), viteReact()],
 });

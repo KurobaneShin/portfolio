@@ -20,7 +20,6 @@ export const Route = createFileRoute("/blog/")({
   headers: () => ({
     "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
     "CDN-Cache-Control": "public, s-maxage=60",
-    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
     Vary: "Cookie",
   }),
   head: ({ loaderData: data }) => {

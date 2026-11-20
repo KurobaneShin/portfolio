@@ -1,0 +1,10 @@
+node_modules
+.output
+.vercel
+.git
+.github
+.cache
+.env
+tmp
+Dockerfile
+.dockerignore

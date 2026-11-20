@@ -1,21 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { listPosts } from "~/modules/blog.server";
 import { asLocale } from "~/modules/i18n";
-import { originOf } from "~/modules/origin.server";
-
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+import { SITE_URL as origin, xmlEscape as esc } from "~/modules/site.server";
 
 const rss = (request: Request) => {
   const url = new URL(request.url);
-  const origin = originOf(request);
   const locale = asLocale(url.searchParams.get("lng"));
   const items = listPosts(locale)
     .map((p) => {
       const link = `${origin}/blog/${p.slug}?lng=${p.locale}`;
       return `    <item>
       <title>${esc(p.title)}</title>
-      <link>${link}</link>
-      <guid isPermaLink="true">${link}</guid>
+      <link>${esc(link)}</link>
+      <guid isPermaLink="true">${esc(link)}</guid>
       <pubDate>${new Date(`${p.date}T12:00:00Z`).toUTCString()}</pubDate>
       <description>${esc(p.description)}</description>
     </item>`;

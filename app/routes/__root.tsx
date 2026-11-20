@@ -8,6 +8,7 @@ import { getPublicEnv } from "~/modules/env.functions";
 import { createI18n } from "~/modules/i18n";
 import { getCookieLocale } from "~/modules/locale";
 import { htmlLang } from "~/modules/person";
+import { safeJson } from "~/modules/seo";
 
 import stylesHref from "../tailwind.css?url";
 
@@ -48,7 +49,7 @@ export const Route = createRootRoute({
       ...(env?.UMAMI_SCRIPT_URL && env.UMAMI_WEBSITE_ID
         ? [{ src: env.UMAMI_SCRIPT_URL, defer: true, "data-website-id": env.UMAMI_WEBSITE_ID }]
         : []),
-      { children: `window.ENV = ${JSON.stringify(env).replace(/</g, "\u003c")}` },
+      { children: `window.ENV = ${safeJson(env)}` },
     ],
   }),
   shellComponent: RootDocument,

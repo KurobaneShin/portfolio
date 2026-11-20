@@ -17,6 +17,7 @@ import {
 import { contactSchema } from "~/modules/contact";
 import { sendContact } from "~/modules/contact.functions";
 import { getCompanies, getProjects } from "~/modules/home.functions";
+import { getPublicEnv } from "~/modules/env.functions";
 import { getT } from "~/modules/i18n";
 import { getMeta, ldJson } from "~/modules/seo";
 import { ogLocale, person } from "~/modules/person";
@@ -34,8 +35,9 @@ import { IconType } from "react-icons";
 
 export const Route = createFileRoute("/")({
   loaderDeps: ({ search }) => ({ lng: search.lng }),
-  loader: ({ context: { locale } }) => ({
+  loader: async ({ context: { locale } }) => ({
     locale,
+    origin: (await getPublicEnv()).SITE_URL,
     description: getT(locale)("description"),
     projectsQuery: getProjects({ data: locale }),
     companiesQuery: getCompanies({ data: locale }),
@@ -43,11 +45,10 @@ export const Route = createFileRoute("/")({
   headers: () => ({
     "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
     "CDN-Cache-Control": "public, s-maxage=60",
-    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
     Vary: "Cookie",
   }),
   head: ({ loaderData }) => {
-    const origin = "https://portfolio-kurobanes-projects.vercel.app";
+    const origin = loaderData?.origin ?? "";
     const { meta, links } = getMeta({
       title: "Kurobane (Icaro)",
       description: loaderData?.description,
