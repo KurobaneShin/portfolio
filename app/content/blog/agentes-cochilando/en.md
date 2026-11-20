@@ -1,6 +1,6 @@
 ---
 title: My AI agents spent 207 hours napping
-description: In 30 days my agents sat idle for over 5 minutes 600 times. 357 of those were a sleep asking "done yet?". And every question cost re-reading an entire book.
+description: In 30 days my agents sat idle for over 5 minutes 600 times. 357 of those were a sleep asking "done yet?" And every question cost re-reading an entire book.
 date: 2026-11-25
 tag: ia
 image: /blog/agentes-cochilando/og-en.jpg
@@ -17,11 +17,11 @@ Picture an intern waiting on a build. Every minute they walk to your desk and as
 
 Now picture that before every question, they re-read every document in the project from scratch. All of them.
 
-That's how a language model works. Every time the agent "comes back", it re-reads the whole conversation context. In my sessions that's 350 to 480 thousand tokens at the median, and over 800 thousand in the longest ones.
+That's how a language model works. Every time the agent "comes back", it re-reads the whole conversation context. A typical session of mine carries 350k to 480k tokens of context, and the longest go past 800k.
 
-There's a cache, and it works very well: about 98% hit rate. But the cache lasts 5 minutes. An agent that naps for 6 minutes wakes up without it and pays for the full re-read at full price.
+There's a cache, and it works very well: about a 98% hit rate. But the cache lasts 5 minutes. An agent that naps for 6 minutes wakes up without it and pays for the full re-read at full price.
 
-So the agent wasn't just idle. It was idle in the most expensive way possible.
+So every time the agent woke up, it paid the whole bill again.
 
 ## What I changed
 
@@ -36,4 +36,4 @@ An agent's cost isn't the size of its answer. It's how many times it comes back,
 
 An agent that asks less and waits properly is cheaper than a cheap model asking all the time.
 
-And now I have a script that measures this per project. Because, well: numbers that match the source.
+And now I have a script that measures this per project. Because I'd had enough of guessing what AI costs.

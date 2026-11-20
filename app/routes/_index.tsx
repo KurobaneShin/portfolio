@@ -156,6 +156,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     ? "delivered@resend.dev"
     : "icarofdiniz@gmail.com";
 
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
   const { error } = await resend.emails.send({
     from,
     to: [
@@ -164,9 +167,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     subject: "hire",
     html: `
     <div>
-      <h1>Hi, my name is ${name}</h1>
-      <p>Email: ${email}</p>
-      <p>${message}</p>
+      <h1>Hi, my name is ${esc(name)}</h1>
+      <p>Email: ${esc(email)}</p>
+      <p>${esc(message)}</p>
     </div>
     `,
   });

@@ -5,8 +5,6 @@ date: 2026-11-23
 tag: mmo
 image: /blog/lan-house/og-pt.jpg
 ---
-Eu já tentei editar o HP de um MMO direto na memória. Na lan house.
-
 Nasci em 99 e ia pra lan house desde os 4 anos. MU, Ragnarok, Priston Tale. O Priston eu jogava em servidor privado, com guild, e sempre tinha um cara que sabia achar o HP na memória do jogo. Eu queria ser esse cara.
 
 Fui aprender. Abrir o processo do jogo, procurar um valor, levar um hit, procurar de novo só entre os endereços que mudaram, até sobrar um. Trocar o 120 por 9999 e olhar pra barra de vida esperando milagre.

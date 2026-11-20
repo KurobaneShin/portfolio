@@ -1,6 +1,6 @@
 ---
 title: Quem manda no jogo, o seu PC ou o servidor?
-description: Por que editar o HP na memória às vezes não dava em nada. O que é um tick, por que o meu servidor roda 30 por segundo e quanto custa cada rodada.
+description: Por que editar o HP na memória às vezes não dava em nada. O que é um tick, quem decide o que acontece e quanto custa cada rodada.
 date: 2026-11-24
 tag: mmo
 image: /blog/quem-manda-no-jogo/og-pt.jpg
@@ -48,10 +48,10 @@ se bateu o limite:
     descarta o que sobrou (o jogo fica mais lento, mas não pula)
 ```
 
-Esse limite é importante. Se o servidor engasgar, ele não tenta "recuperar o atraso" rodando 50 ticks de uma vez, que travaria tudo de novo. Ele aceita ficar um pouco mais lento. Isso tem nome, e vai ter post próprio.
+Esse limite é importante. Se o servidor engasgar, ele não tenta "recuperar o atraso" rodando 50 ticks de uma vez, o que travaria tudo de novo. Ele aceita ficar um pouco mais lento. Isso tem nome, e vai ter post próprio.
 
 ## O que eu levo pro trabalho web
 
 Como o mundo anda em passo fixo, eu testo combate igual testo uma API: manda o input, roda os ticks, confere o resultado. Sem esperar relógio, sem teste que passa às vezes.
 
-Separar "quando o mundo muda" de "quando a tela desenha" é a mesma ideia de separar o estado do servidor da renderização no front. Só que aqui, se você erra, alguém edita o HP.
+E deixar o servidor como única fonte da verdade é a mesma regra de nunca confiar no front: preço, desconto e permissão se validam no backend. Só que aqui, se você erra, alguém edita o HP.

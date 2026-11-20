@@ -1,15 +1,13 @@
 ---
 title: I once tried to edit an MMO's HP straight in memory
-description: Born in '99, going to LAN centers since I was 4. Now I'm a web dev building an MMO from scratch to understand what I didn't back then.
+description: Born in '99, started going to LAN centers at 4. Now I'm a web dev building an MMO from scratch to understand what I didn't back then.
 date: 2026-11-23
 tag: mmo
 image: /blog/lan-house/og-en.jpg
 ---
-I once tried to edit an MMO's HP straight in memory. At a LAN center in Brazil.
+I was born in '99 and started going to lan houses, Brazil's LAN centers, at 4. MU, Ragnarok, Priston Tale. I played Priston on private servers, with a guild, and there was always one guy who knew where the HP lived in the game's memory. I wanted to be that guy.
 
-I was born in '99 and started going to LAN centers at 4. MU, Ragnarok, Priston Tale. I played Priston on private servers, with a guild, and there was always one guy who knew where the HP lived in the game's memory. I wanted to be that guy.
-
-So I learned. Attach to the game process, search for a value, take a hit, search again only among the addresses that changed, until one was left. Swap the 120 for 9999 and stare at the health bar waiting for a miracle.
+So I learned. Attach to the game process, search for a value, take a hit, search again only among the addresses that changed, until one is left. Swap the 120 for 9999 and stare at the health bar waiting for a miracle.
 
 Half the time nothing happened, and I had no idea why.
 

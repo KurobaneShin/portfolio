@@ -5,7 +5,7 @@ date: 2026-11-25
 tag: ia
 image: /blog/agentes-cochilando/og-pt.jpg
 ---
-Eu uso agente de IA pra quase tudo: rodar teste, revisar PR, e até construir o meu MMO. Um dia fui medir quanto isso custa de verdade e achei um número ridículo.
+Eu uso agente de IA pra quase tudo: rodar teste, revisar PR e até construir o meu MMO. Um dia fui medir quanto isso custa de verdade e achei um número ridículo.
 
 Em 30 dias, os subagentes ficaram parados por mais de 5 minutos **600 vezes**. Somando, umas **207 horas**. Quase nove dias de agente olhando pro teto.
 
@@ -17,11 +17,11 @@ Imagina um estagiário esperando um build. A cada minuto ele vai até a sua mesa
 
 Agora imagina que, antes de cada pergunta, ele relê do zero todos os documentos do projeto. Todos.
 
-É assim que um modelo de linguagem funciona. Cada vez que o agente "volta", ele relê o contexto inteiro da conversa. Nas minhas sessões isso dá de 350 a 480 mil tokens na mediana, e passa de 800 mil nas mais longas.
+É assim que um modelo de linguagem funciona. Cada vez que o agente "volta", ele relê o contexto inteiro da conversa. Uma sessão típica minha carrega entre 350 e 480 mil tokens de contexto, e as mais longas passam de 800 mil.
 
 Tem cache, e ele funciona muito bem: uns 98% de acerto. Mas o cache dura 5 minutos. O agente que cochila 6 minutos acorda sem cache e paga a releitura inteira com preço cheio.
 
-Ou seja: o agente não estava só parado. Ele estava parado do jeito mais caro possível.
+Ou seja: toda vez que acordava, o agente pagava a conta inteira de novo.
 
 ## O que eu mudei
 
@@ -36,4 +36,4 @@ O custo de um agente não é o tamanho da resposta. É quantas vezes ele volta, 
 
 Um agente que pergunta menos e espera direito sai mais barato do que um modelo barato perguntando o tempo todo.
 
-E agora eu tenho um script que mede isso por projeto. Porque, né: número que bate com a fonte.
+E agora eu tenho um script que mede isso por projeto. Porque achismo sobre custo de IA eu já tive bastante.
