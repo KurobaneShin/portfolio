@@ -42,7 +42,7 @@
     "remix-i18next": "^6.4.1",
     "remix-themes": "^1.6.1",
     "remix-toast": "^1.2.2",
-    "resend": "^3.5.0",
+    "resend": "^6.38.1",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.2",
     "tailwindcss-animate": "^1.0.7",
