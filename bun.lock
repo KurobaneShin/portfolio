@@ -32,7 +32,7 @@
         "react-i18next": "^15.7.4",
         "react-icons": "^5.7.0",
         "remix-i18next": "^6.4.1",
-        "remix-themes": "^1.6.1",
+        "remix-themes": "^2.0.4",
         "remix-toast": "^1.2.2",
         "resend": "^3.5.0",
         "sonner": "^1.7.4",
@@ -1637,7 +1637,7 @@
 
     "remix-i18next": ["remix-i18next@6.4.1", "", { "peerDependencies": { "@remix-run/cloudflare": "^2.0.0", "@remix-run/deno": "^2.0.0", "@remix-run/node": "^2.0.0", "@remix-run/react": "^2.0.0", "i18next": "^23.1.0", "react": "^16.8.0 || ^17.0.0 || ^18.0.0", "react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0" }, "optionalPeers": ["@remix-run/cloudflare", "@remix-run/deno", "@remix-run/node"] }, "sha512-Ma4ESNj8uZmm/Fjq2ZHEbsGvYYO2rV1BtqwIFPAYUeitBaED+r0pNXktUzvsHEanvbFOZPAhEcp5f17vDslmeA=="],
 
-    "remix-themes": ["remix-themes@1.6.1", "", { "peerDependencies": { "@remix-run/react": ">= 1", "@remix-run/server-runtime": ">= 1" } }, "sha512-wqJyNKJ2hiOweycQzsAk7CZm+2mKNAbW2QZcX0riw52XepAxf9R2v8NYyeUz+uWmb3Fulyi71s4aipNRTxCysw=="],
+    "remix-themes": ["remix-themes@2.0.4", "", { "peerDependencies": { "react-router": ">=7.0.0" } }, "sha512-S1vIx86xdsMv+ceaWGWtlVZBMhU4tmZeBOBzOiZnhbHnGBbd5YeyIlZ5EL3BSEhZq35oEcINeTrMrVju9GPYEA=="],
 
     "remix-toast": ["remix-toast@1.2.2", "", { "dependencies": { "zod": "^3.22.3" }, "peerDependencies": { "@remix-run/server-runtime": ">=1.15" } }, "sha512-GayR/ozpqCZWI9AK0+wzp/SaD3jIUnx7IBSL4Oioglp1gs3waGWlHhgBtG+IbLmCR9iUzzrux0HiZQdk8uwYVg=="],
 
