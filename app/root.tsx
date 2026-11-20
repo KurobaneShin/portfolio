@@ -97,6 +97,12 @@ export function App() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
+        {data.ENV.GOOGLE_SITE_VERIFICATION && (
+          <meta name="google-site-verification" content={data.ENV.GOOGLE_SITE_VERIFICATION} />
+        )}
+        {data.ENV.UMAMI_SCRIPT_URL && data.ENV.UMAMI_WEBSITE_ID && (
+          <script defer src={data.ENV.UMAMI_SCRIPT_URL} data-website-id={data.ENV.UMAMI_WEBSITE_ID} />
+        )}
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
         <Links />
       </head>

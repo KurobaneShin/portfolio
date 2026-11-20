@@ -5,6 +5,9 @@ const schema = z.object({
   NODE_ENV: z.enum(["production", "development", "test"] as const),
   SUPABASE_SERVICE_ROLE_KEY: z.string(),
   SUPABASE_URL: z.string(),
+  UMAMI_SCRIPT_URL: z.string().url().optional(),
+  UMAMI_WEBSITE_ID: z.string().optional(),
+  GOOGLE_SITE_VERIFICATION: z.string().optional(),
 });
 
 type ValidatedEnvs = z.infer<typeof schema>;
@@ -27,6 +30,10 @@ export function init() {
 export function getEnv() {
   return {
     MODE: process.env.NODE_ENV,
+    // Public values: they end up in the page anyway.
+    UMAMI_SCRIPT_URL: process.env.UMAMI_SCRIPT_URL,
+    UMAMI_WEBSITE_ID: process.env.UMAMI_WEBSITE_ID,
+    GOOGLE_SITE_VERIFICATION: process.env.GOOGLE_SITE_VERIFICATION,
   };
 }
 
