@@ -238,6 +238,9 @@ function Index() {
     async onSubmit(event, { formData }) {
       event.preventDefault();
       const res = await sendContact({ data: formData });
+      (window as { umami?: { track: (e: string, d?: object) => void } }).umami?.track("contact", {
+        status: res.reply?.status ?? "sent",
+      });
       if (res.reply) setLastResult(res.reply);
       if (res.toast) toast(res.toast.message, { description: res.toast.description });
     },
@@ -338,6 +341,8 @@ function Index() {
               >
                 <a
                   href="#contact"
+                  data-umami-event="hire"
+                  data-umami-event-place="hero"
                   className="group inline-flex h-11 items-center gap-2 bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-signal"
                 >
                   {t("hire")}

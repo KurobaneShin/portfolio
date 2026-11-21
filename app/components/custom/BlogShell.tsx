@@ -29,7 +29,7 @@ export function BlogShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-5 py-6 sm:flex-row sm:items-center md:px-10">
           <p className="eyebrow">© {new Date().getFullYear()} Kurobane</p>
           <SocialLinks className="sm:ml-auto" />
-          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal sm:ml-5">
+          <Link to="/" hash="contact" data-umami-event="hire" data-umami-event-place="blog-footer" className="eyebrow transition-colors hover:text-signal sm:ml-5">
             {t("hire")} ↗
           </Link>
         </div>

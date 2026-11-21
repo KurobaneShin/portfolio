@@ -93,15 +93,15 @@ function BlogPost() {
         <aside className="mt-16 border p-6">
           <p className="font-display text-2xl tracking-tight">{t("blog.followTitle")}</p>
           <p className="mt-2 leading-relaxed text-muted-foreground">{t("blog.followText")}</p>
-          <SocialLinks className="mt-4" />
+          <SocialLinks className="mt-4" place="post" />
         </aside>
         <div className="mt-16 flex flex-col gap-4 border-t pt-8 sm:flex-row sm:justify-between">
           {post.linkedin && (
-            <a href={post.linkedin} target="_blank" rel="noreferrer" className="eyebrow transition-colors hover:text-signal">
+            <a href={post.linkedin} target="_blank" rel="noreferrer" data-umami-event="discuss" data-umami-event-post={post.slug} className="eyebrow transition-colors hover:text-signal">
               {t("blog.discuss")} ↗
             </a>
           )}
-          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal">{copy["blog.cta"]} ↗</Link>
+          <Link to="/" hash="contact" data-umami-event="hire" data-umami-event-place="post" className="eyebrow transition-colors hover:text-signal">{copy["blog.cta"]} ↗</Link>
         </div>
       </article>
     </BlogShell>
