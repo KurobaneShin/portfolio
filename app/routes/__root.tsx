@@ -47,7 +47,18 @@ export const Route = createRootRoute({
     ],
     scripts: [
       ...(env?.UMAMI_SCRIPT_URL && env.UMAMI_WEBSITE_ID
-        ? [{ src: env.UMAMI_SCRIPT_URL, defer: true, "data-website-id": env.UMAMI_WEBSITE_ID }]
+        ? [
+            {
+              src: env.UMAMI_SCRIPT_URL,
+              defer: true,
+              "data-website-id": env.UMAMI_WEBSITE_ID,
+              "data-domains": "kurobane.com.br",
+              "data-performance": "true",
+              "data-errors": "true",
+            },
+            // Heatmaps; what it records is set per website in the Umami dashboard.
+            { src: env.UMAMI_SCRIPT_URL.replace(/script\.js$/, "recorder.js"), defer: true, "data-website-id": env.UMAMI_WEBSITE_ID },
+          ]
         : []),
       { children: `window.ENV = ${safeJson(env)}` },
     ],
