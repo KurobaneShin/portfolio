@@ -16,9 +16,8 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { contactSchema } from "~/modules/contact";
 import { sendContact } from "~/modules/contact.functions";
-import { getCompanies, getProjects } from "~/modules/home.functions";
+import { getCompanies, getHomeContent, getProjects } from "~/modules/home.functions";
 import { getPublicEnv } from "~/modules/env.functions";
-import { getT } from "~/modules/i18n";
 import { getMeta, ldJson } from "~/modules/seo";
 import { ogLocale, person } from "~/modules/person";
 import { ReactNode, useState } from "react";
@@ -35,13 +34,21 @@ import { IconType } from "react-icons";
 
 export const Route = createFileRoute("/")({
   loaderDeps: ({ search }) => ({ lng: search.lng }),
-  loader: async ({ context: { locale } }) => ({
-    locale,
-    origin: (await getPublicEnv()).SITE_URL,
-    description: getT(locale)("description"),
-    projectsQuery: getProjects({ data: locale }),
-    companiesQuery: getCompanies({ data: locale }),
-  }),
+  loader: async ({ context: { locale } }) => {
+    const projectsQuery = getProjects({ data: locale });
+    const companiesQuery = getCompanies({ data: locale });
+    const [{ copy, cases, clients }, env] = await Promise.all([getHomeContent({ data: locale }), getPublicEnv()]);
+    return {
+      locale,
+      origin: env.SITE_URL,
+      description: copy["description"],
+      copy,
+      cases,
+      clients,
+      projectsQuery,
+      companiesQuery,
+    };
+  },
   headers: () => ({
     "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
     "CDN-Cache-Control": "public, s-maxage=60",
@@ -78,22 +85,6 @@ export const Route = createFileRoute("/")({
   },
   component: Index,
 });
-
-const CASES = [
-  "media",
-  "sharecare",
-  "cloudkitchens",
-  "minhasinscricoes",
-  "jveiga",
-  "confiou",
-] as const;
-
-const CLIENTS = [
-  "sharecare",
-  "cloudkitchens",
-  "minhasinscricoes",
-  "jveiga",
-] as const;
 
 const CAPABILITIES: { key: string; name: string; icon: IconType }[] = [
   { key: "go", name: "Go", icon: FaGolang },
@@ -233,7 +224,7 @@ function SectionHead({
 
 function Index() {
   const { t } = useTranslation();
-  const { projectsQuery, companiesQuery } = Route.useLoaderData();
+  const { projectsQuery, companiesQuery, copy, cases, clients } = Route.useLoaderData();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -327,18 +318,18 @@ function Index() {
           />
           <div className="relative mx-auto grid max-w-[1280px] gap-12 px-5 pb-20 pt-16 md:grid-cols-12 md:px-10 md:pb-28 md:pt-24">
             <div className="md:col-span-8">
-              <p className="eyebrow animate-rise">{t("hero.eyebrow")}</p>
+              <p className="eyebrow animate-rise">{copy["hero.eyebrow"]}</p>
               <h1
                 className="mt-8 animate-rise text-[2.6rem] font-light leading-[1.02] tracking-[-0.025em] sm:text-6xl lg:text-[5.25rem]"
                 style={{ animationDelay: "80ms" }}
               >
-                {t("hero.headline")}
+                {copy["hero.headline"]}
               </h1>
               <p
                 className="mt-8 max-w-[58ch] animate-rise text-lg leading-relaxed text-muted-foreground"
                 style={{ animationDelay: "180ms" }}
               >
-                {t("description")}
+                {copy["description"]}
               </p>
               <div
                 className="mt-10 flex animate-rise flex-wrap items-center gap-3"
@@ -374,32 +365,32 @@ function Index() {
                 />
                 <div className="space-y-1">
                   <p className="font-display text-lg leading-none">Ícaro Diniz</p>
-                  <p className="eyebrow">{t("hero.location")}</p>
+                  <p className="eyebrow">{copy["hero.location"]}</p>
                   <p className="flex items-center gap-2 font-mono text-xs text-foreground">
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal opacity-60" />
                       <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-signal" />
                     </span>
-                    {t("hero.available")}
+                    {copy["hero.available"]}
                   </p>
                 </div>
               </div>
-              <p className="eyebrow mt-8">{t("hero.clientsTitle")}</p>
+              <p className="eyebrow mt-8">{copy["hero.clientsTitle"]}</p>
               <ul className="mt-4 border-t">
-                {CLIENTS.map((k) => (
-                  <li key={k}>
+                {clients.map((cl) => (
+                  <li key={cl.slug}>
                     <a
                       href="#cases"
                       className="group flex items-baseline gap-3 border-b py-3.5 transition-colors"
                     >
                       <span className="font-display text-[1.6rem] font-light leading-none tracking-[-0.01em] transition-colors group-hover:text-signal">
-                        {t(`hero.clients.${k}.name`)}
+                        {cl.name}
                       </span>
                       <span
                         aria-hidden
                         className="mb-1 flex-1 border-b border-dotted border-muted-foreground/40"
                       />
-                      <span className="eyebrow">{t(`hero.clients.${k}.sector`)}</span>
+                      <span className="eyebrow">{cl.sector}</span>
                     </a>
                   </li>
                 ))}
@@ -410,27 +401,27 @@ function Index() {
 
         {/* Cases: the ledger */}
         <section id="cases" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
-          <SectionHead index={1} title={t("cases.title")} description={t("cases.description")} />
+          <SectionHead index={1} title={copy["cases.title"]} description={copy["cases.description"]} />
           <ol className="mt-14 border-b">
-            {CASES.map((c, i) => (
-              <li key={c}>
+            {cases.map((c, i) => (
+              <li key={c.slug}>
                 <Reveal delay={i * 0.04}>
                   <article className="group grid gap-4 border-t py-8 transition-colors hover:bg-card md:grid-cols-12 md:gap-8 md:py-10">
                     <p className="font-mono text-xs tabular-nums text-muted-foreground transition-colors group-hover:text-signal md:col-span-1">
                       № {pad(i + 1)}
                     </p>
                     <div className="md:col-span-3">
-                      <p className="eyebrow">{t(`cases.${c}.client`)}</p>
+                      <p className="eyebrow">{c.client}</p>
                       <h3 className="mt-2 font-sans text-lg font-medium leading-snug">
-                        {t(`cases.${c}.title`)}
+                        {c.title}
                       </h3>
                     </div>
                     <div className="md:col-span-8">
                       <p className="font-display text-2xl font-light leading-tight tracking-[-0.01em] sm:text-3xl">
-                        {t(`cases.${c}.metric`)}
+                        {c.metric}
                       </p>
                       <p className="mt-3 max-w-[64ch] leading-relaxed text-muted-foreground">
-                        {t(`cases.${c}.detail`)}
+                        {c.detail}
                       </p>
                     </div>
                   </article>
@@ -443,7 +434,7 @@ function Index() {
         {/* Projects */}
         <section id="projects" className="scroll-mt-14 border-y bg-card">
           <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
-            <SectionHead index={2} title={t("featured.title")} description={t("featured.description")} />
+            <SectionHead index={2} title={copy["featured.title"]} description={copy["featured.description"]} />
             <div className="mt-14 grid border-l border-t sm:grid-cols-2 lg:grid-cols-3">
               <Await promise={projectsQuery} fallback={<p className="eyebrow p-6">…</p>}>
                   {(projects) =>
@@ -477,7 +468,7 @@ function Index() {
 
         {/* Capabilities */}
         <section id="skills" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
-          <SectionHead index={3} title={t("skills.title")} description={t("skills.description")} />
+          <SectionHead index={3} title={copy["skills.title"]} description={copy["skills.description"]} />
           <div className="mt-14 grid gap-px overflow-hidden border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {CAPABILITIES.map((c, i) => (
               <Reveal key={c.key} delay={i * 0.05} className="bg-background">
@@ -499,7 +490,7 @@ function Index() {
         {/* Experience */}
         <section id="experience" className="scroll-mt-14 border-t bg-card">
           <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
-            <SectionHead index={4} title={t("exp.title")} description={t("exp.description")} />
+            <SectionHead index={4} title={copy["exp.title"]} description={copy["exp.description"]} />
             <ol className="mt-14 border-b">
               <CatchBoundary getResetKey={() => "companies"} errorComponent={() => <li className="eyebrow py-6">—</li>}>
                 <Await promise={companiesQuery} fallback={<li className="eyebrow py-6">…</li>}>
@@ -542,7 +533,7 @@ function Index() {
 
         {/* Stack */}
         <section id="expertise" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
-          <SectionHead index={5} title={t("expertise.title")} description={t("expertise.description")} />
+          <SectionHead index={5} title={copy["expertise.title"]} description={copy["expertise.description"]} />
           <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {STACK.map((g) => (
               <Reveal key={g.group}>
@@ -576,10 +567,10 @@ function Index() {
                 <span className="text-signal">§ 06</span>
               </p>
               <h2 className="mt-6 text-5xl font-light leading-[1.02] tracking-[-0.025em] lg:text-7xl">
-                {t("touch.title")}
+                {copy["touch.title"]}
               </h2>
               <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-primary-foreground/70">
-                {t("touch.description")}
+                {copy["touch.description"]}
               </p>
             </div>
             <form

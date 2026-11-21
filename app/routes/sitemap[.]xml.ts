@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { listSlugs } from "~/modules/blog.server";
 import { SITE_URL as origin, xmlEscape } from "~/modules/site.server";
 
-const sitemap = () => {
+const sitemap = async () => {
   const paths = [
     "/",
     "/blog",
-    ...listSlugs().flatMap((slug) => [`/blog/${slug}?lng=ptBR`, `/blog/${slug}?lng=en`]),
+    ...(await listSlugs()).flatMap((slug) => [`/blog/${slug}?lng=ptBR`, `/blog/${slug}?lng=en`]),
   ];
   const urls = paths.map((path) => `  <url><loc>${xmlEscape(origin)}${xmlEscape(path)}</loc></url>`).join("\n");
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

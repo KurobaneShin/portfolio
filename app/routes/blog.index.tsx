@@ -2,19 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BlogShell } from "~/components/custom/BlogShell";
 import { getBlogIndex } from "~/modules/blog.functions";
-import { getT } from "~/modules/i18n";
 import { getMeta } from "~/modules/seo";
 import { AVATAR_URL, ogLocale } from "~/modules/person";
 
 export const Route = createFileRoute("/blog/")({
   loaderDeps: ({ search }) => ({ lng: search.lng }),
   loader: async ({ context: { locale } }) => {
-    const t = getT(locale);
+    const data = await getBlogIndex({ data: locale });
     return {
       locale,
-      ...(await getBlogIndex({ data: locale })),
-      title: t("blog.title"),
-      description: t("blog.description"),
+      ...data,
+      title: data.copy["blog.title"],
+      description: data.copy["blog.description"],
     };
   },
   headers: () => ({
@@ -46,12 +45,12 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogIndex() {
-  const { posts, title, description } = Route.useLoaderData();
+  const { posts, title, description, copy } = Route.useLoaderData();
   const { t } = useTranslation();
   return (
     <BlogShell>
       <section className="mx-auto max-w-[860px] px-5 py-16 md:px-10 md:py-24">
-        <p className="eyebrow">{t("blog.eyebrow")}</p>
+        <p className="eyebrow">{copy["blog.eyebrow"]}</p>
         <h1 className="mt-4 font-display text-5xl tracking-tight md:text-6xl">{title}</h1>
         <p className="mt-6 max-w-[58ch] text-lg leading-relaxed text-muted-foreground">{description}</p>
         <ol className="mt-14 divide-y border-y">

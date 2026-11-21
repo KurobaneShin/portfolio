@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { cachified } from "~/modules/cache.server";
+import { getCases, getClients, getCopy } from "~/modules/content.server";
 import { supabase } from "~/modules/supabase.server";
 
 const locale = z.enum(["en", "ptBR"]);
@@ -45,3 +46,11 @@ export const getCompanies = createServerFn()
       },
     })
   );
+
+export const getHomeContent = createServerFn()
+  .validator(locale)
+  .handler(async ({ data: locale }) => ({
+    copy: await getCopy(locale),
+    cases: await getCases(locale),
+    clients: await getClients(locale),
+  }));

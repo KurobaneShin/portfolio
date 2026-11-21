@@ -3,10 +3,10 @@ import { listPosts } from "~/modules/blog.server";
 import { asLocale } from "~/modules/i18n";
 import { SITE_URL as origin, xmlEscape as esc } from "~/modules/site.server";
 
-const rss = (request: Request) => {
+const rss = async (request: Request) => {
   const url = new URL(request.url);
   const locale = asLocale(url.searchParams.get("lng"));
-  const items = listPosts(locale)
+  const items = (await listPosts(locale))
     .map((p) => {
       const link = `${origin}/blog/${p.slug}?lng=${p.locale}`;
       return `    <item>

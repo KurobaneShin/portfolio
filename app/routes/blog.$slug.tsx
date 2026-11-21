@@ -23,7 +23,7 @@ export const Route = createFileRoute("/blog/$slug")({
     const url = `${origin}/blog/${post.slug}`;
     const canonical = `${url}?lng=${post.locale}`;
     const image = post.image ?? post.cover;
-    const imageUrl = image ? origin + image : AVATAR_URL;
+    const imageUrl = image ?? AVATAR_URL;
     const { meta, links } = getMeta({
       title: `${post.title} · Kurobane`,
       description: post.description,
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/blog/$slug")({
           image: imageUrl,
           author: person(origin),
           publisher: person(origin),
-          ...(post.video && { video: { "@type": "VideoObject", name: post.title, description: post.description, contentUrl: origin + post.video, thumbnailUrl: imageUrl, uploadDate: post.date } }),
+          ...(post.video && { video: { "@type": "VideoObject", name: post.title, description: post.description, contentUrl: post.video, thumbnailUrl: imageUrl, uploadDate: post.date } }),
         }),
       ],
     };
@@ -70,7 +70,7 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function BlogPost() {
-  const { post } = Route.useLoaderData();
+  const { post, copy } = Route.useLoaderData();
   const { t } = useTranslation();
   return (
     <BlogShell>
@@ -99,7 +99,7 @@ function BlogPost() {
               {t("blog.discuss")} ↗
             </a>
           )}
-          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal">{t("blog.cta")} ↗</Link>
+          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal">{copy["blog.cta"]} ↗</Link>
         </div>
       </article>
     </BlogShell>
