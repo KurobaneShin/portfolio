@@ -18,6 +18,10 @@ export default {
     followTitle: "Follow the MMO build",
     followText: "I post a piece almost every day on X, Instagram and LinkedIn: numbers, animations and the mistakes too.",
     discuss: "Discuss on LinkedIn",
+    share: "Share",
+    copyLink: "Copy link",
+    copied: "Link copied",
+    copyFailed: "Could not copy the link",
     tags: { mmo: "MMO", web: "Web", ia: "AI" },
   },
   nav: {

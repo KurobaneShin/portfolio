@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { ShareLinks } from "~/components/custom/ShareLinks";
 import { SocialLinks } from "~/components/custom/SocialLinks";
 import { BlogShell } from "~/components/custom/BlogShell";
 import { getBlogPost } from "~/modules/blog.functions";
@@ -74,7 +75,7 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function BlogPost() {
-  const { post, copy } = Route.useLoaderData();
+  const { post, copy, origin } = Route.useLoaderData();
   const { t } = useTranslation();
   return (
     <BlogShell>
@@ -90,6 +91,9 @@ function BlogPost() {
           <LoopVideo src={post.video} poster={post.cover} />
         )}
         <div className="blog-prose mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
+        <div className="mt-12 border-t pt-6">
+          <ShareLinks url={`${origin}/blog/${post.slug}?lng=${post.locale}`} title={post.title} slug={post.slug} />
+        </div>
         <aside className="mt-16 border p-6">
           <p className="font-display text-2xl tracking-tight">{t("blog.followTitle")}</p>
           <p className="mt-2 leading-relaxed text-muted-foreground">{t("blog.followText")}</p>
