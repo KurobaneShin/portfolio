@@ -7,7 +7,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const REV = "15a3c42";
+const REV = "d8f5fa6";
 const LANGS = { en: "en", ptBR: "pt-BR" } as const;
 const CASES = ["media", "sharecare", "cloudkitchens", "minhasinscricoes", "jveiga", "confiou"];
 const CLIENTS = ["sharecare", "cloudkitchens", "minhasinscricoes", "jveiga"];

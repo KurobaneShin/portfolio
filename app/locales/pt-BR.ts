@@ -15,6 +15,8 @@ export default {
   },
   blog: {
     back: "Todos os posts",
+    followTitle: "Acompanhe o meu MMO",
+    followText: "Posto um pedaço quase todo dia no X, no Instagram e no LinkedIn: números, animações e os erros também.",
     discuss: "Comente no LinkedIn",
     tags: { mmo: "MMO", web: "Web", ia: "IA" },
   },

@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { LangChooser } from "./LangChooser";
 import { ModeToggle } from "./ModeToggle";
+import { SocialLinks } from "./SocialLinks";
 
 export function BlogShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
@@ -27,7 +28,8 @@ export function BlogShell({ children }: { children: ReactNode }) {
       <footer className="border-t">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-5 py-6 sm:flex-row sm:items-center md:px-10">
           <p className="eyebrow">© {new Date().getFullYear()} Kurobane</p>
-          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal sm:ml-auto">
+          <SocialLinks className="sm:ml-auto" />
+          <Link to="/" hash="contact" className="eyebrow transition-colors hover:text-signal sm:ml-5">
             {t("hire")} ↗
           </Link>
         </div>
