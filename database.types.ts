@@ -9,6 +9,72 @@ export type Json =
 export type Database = {
   portfolio: {
     Tables: {
+      cases: {
+        Row: {
+          client: string
+          detail: string
+          id: string
+          lang: string
+          metric: string
+          position: number
+          slug: string
+          title: string
+          visible: boolean
+        }
+        Insert: {
+          client: string
+          detail: string
+          id?: string
+          lang: string
+          metric: string
+          position: number
+          slug: string
+          title: string
+          visible?: boolean
+        }
+        Update: {
+          client?: string
+          detail?: string
+          id?: string
+          lang?: string
+          metric?: string
+          position?: number
+          slug?: string
+          title?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      clients: {
+        Row: {
+          id: string
+          lang: string
+          name: string
+          position: number
+          sector: string
+          slug: string
+          visible: boolean
+        }
+        Insert: {
+          id?: string
+          lang: string
+          name: string
+          position: number
+          sector: string
+          slug: string
+          visible?: boolean
+        }
+        Update: {
+          id?: string
+          lang?: string
+          name?: string
+          position?: number
+          sector?: string
+          slug?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           client: string
@@ -63,6 +129,72 @@ export type Database = {
           link?: string
           picture?: string
           title?: string
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          body_md: string
+          cover: string | null
+          description: string
+          id: string
+          image: string | null
+          lang: string
+          linkedin: string | null
+          published: boolean
+          published_at: string
+          slug: string
+          tag: string
+          title: string
+          video: string | null
+        }
+        Insert: {
+          body_md: string
+          cover?: string | null
+          description: string
+          id?: string
+          image?: string | null
+          lang: string
+          linkedin?: string | null
+          published?: boolean
+          published_at: string
+          slug: string
+          tag: string
+          title: string
+          video?: string | null
+        }
+        Update: {
+          body_md?: string
+          cover?: string | null
+          description?: string
+          id?: string
+          image?: string | null
+          lang?: string
+          linkedin?: string | null
+          published?: boolean
+          published_at?: string
+          slug?: string
+          tag?: string
+          title?: string
+          video?: string | null
+        }
+        Relationships: []
+      }
+      site_copy: {
+        Row: {
+          key: string
+          lang: string
+          value: string
+        }
+        Insert: {
+          key: string
+          lang: string
+          value: string
+        }
+        Update: {
+          key?: string
+          lang?: string
+          value?: string
         }
         Relationships: []
       }

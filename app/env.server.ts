@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SITE_URL } from "~/modules/site.server";
 
 const schema = z.object({
   RESEND_API_KEY: z.string(),
@@ -8,6 +9,7 @@ const schema = z.object({
   UMAMI_SCRIPT_URL: z.string().url().optional(),
   UMAMI_WEBSITE_ID: z.string().optional(),
   GOOGLE_SITE_VERIFICATION: z.string().optional(),
+  SITE_URL: z.url().optional(),
 });
 
 type ValidatedEnvs = z.infer<typeof schema>;
@@ -30,6 +32,7 @@ export function init() {
 export function getEnv() {
   return {
     MODE: process.env.NODE_ENV,
+    SITE_URL,
     // Public values: they end up in the page anyway.
     UMAMI_SCRIPT_URL: process.env.UMAMI_SCRIPT_URL,
     UMAMI_WEBSITE_ID: process.env.UMAMI_WEBSITE_ID,

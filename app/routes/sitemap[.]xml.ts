@@ -1,14 +1,14 @@
-import type { LoaderFunctionArgs } from "@vercel/remix";
+import { createFileRoute } from "@tanstack/react-router";
 import { listSlugs } from "~/modules/blog.server";
+import { SITE_URL as origin, xmlEscape } from "~/modules/site.server";
 
-export const loader = ({ request }: LoaderFunctionArgs) => {
-  const origin = new URL(request.url).origin;
+const sitemap = async () => {
   const paths = [
     "/",
     "/blog",
-    ...listSlugs().flatMap((slug) => [`/blog/${slug}?lng=ptBR`, `/blog/${slug}?lng=en`]),
+    ...(await listSlugs()).flatMap((slug) => [`/blog/${slug}?lng=ptBR`, `/blog/${slug}?lng=en`]),
   ];
-  const urls = paths.map((path) => `  <url><loc>${origin}${path.replace(/&/g, "&amp;")}</loc></url>`).join("\n");
+  const urls = paths.map((path) => `  <url><loc>${xmlEscape(origin)}${xmlEscape(path)}</loc></url>`).join("\n");
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
@@ -21,3 +21,7 @@ ${urls}
     },
   });
 };
+
+export const Route = createFileRoute("/sitemap.xml")({
+  server: { handlers: { GET: () => sitemap() } },
+});

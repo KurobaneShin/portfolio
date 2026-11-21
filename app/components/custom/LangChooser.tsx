@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@radix-ui/react-dropdown-menu";
-import { Form } from "@remix-run/react";
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 export const LangChooser = () => {
@@ -25,30 +25,30 @@ export const LangChooser = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
-        <Form>
+        <>
           <DropdownMenuLabel>{t("langChooser.title")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <button
-                name="lng"
-                value="en"
+              <Link
+                to="."
+                search={{ lng: "en" }}
                 className="cursor-pointer flex w-full items-center justify-between"
               >
                 {t("langChooser.english")}
-              </button>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <button
-                name="lng"
-                value="ptBR"
+              <Link
+                to="."
+                search={{ lng: "ptBR" }}
                 className="cursor-pointer flex w-full items-center justify-between"
               >
                 {t("langChooser.portuguese")}
-              </button>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-        </Form>
+        </>
       </DropdownMenuContent>
     </DropdownMenu>
   );

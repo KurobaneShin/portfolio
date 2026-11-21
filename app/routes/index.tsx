@@ -1,21 +1,11 @@
-import {
-  HeadersFunction,
-  LinksFunction,
-  MetaFunction,
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-} from "@vercel/remix";
+import { createFileRoute, Await, CatchBoundary } from "@tanstack/react-router";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { parseWithZod } from "@conform-to/zod";
-import {
-  Await,
-  Form,
-  json,
-  useActionData,
-  useLoaderData,
-} from "@remix-run/react";
+import { parseWithZod } from "@conform-to/zod/v4";
+import { type SubmissionResult, useForm } from "@conform-to/react";
 import { ArrowUpRightIcon, MenuIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import type { z } from "zod";
 import { LangChooser } from "~/components/custom/LangChooser";
 import { ModeToggle } from "~/components/custom/ModeToggle";
 import {
@@ -24,16 +14,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import i18nServer from "~/modules/i18n.server";
-import { resend } from "~/modules/resend.server";
-import { z } from "zod";
-import { useForm } from "@conform-to/react";
-import { getMeta } from "~/modules/seo";
+import { contactSchema } from "~/modules/contact";
+import { sendContact } from "~/modules/contact.functions";
+import { getCompanies, getHomeContent, getProjects } from "~/modules/home.functions";
+import { getPublicEnv } from "~/modules/env.functions";
+import { getMeta, ldJson } from "~/modules/seo";
 import { ogLocale, person } from "~/modules/person";
-import { supabase } from "~/modules/supabase.server";
-import { jsonWithError, jsonWithSuccess } from "remix-toast";
-import { cachified } from "~/modules/cache.server";
-import { ReactNode, Suspense } from "react";
+import { ReactNode, useState } from "react";
 import { FaDatabase, FaDocker, FaLaptopCode, FaNodeJs, FaReact, FaVuejs } from "react-icons/fa";
 import { FaGolang, FaTv } from "react-icons/fa6";
 import { SiExpress, SiGooglebigquery, SiKubernetes, SiMongodb, SiPrisma, SiRedis, SiTerraform, SiTrpc, SiTypeorm, SiTypescript } from "react-icons/si";
@@ -43,166 +30,62 @@ import { RiCodeSSlashLine, RiNextjsFill, RiRemixRunFill, RiSpeedUpFill, RiTailwi
 import { BiLogoPostgresql } from "react-icons/bi";
 import { GrMysql, GrTools } from "react-icons/gr";
 import { IoLibrarySharp } from "react-icons/io5";
+import { SocialLinks } from "~/components/custom/SocialLinks";
 import { IconType } from "react-icons";
 
-export const links: LinksFunction = () => [
-  { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
-  {
-    rel: "preload",
-    href: "https://avatars.githubusercontent.com/u/47834261?v=4",
-    as: "image",
+export const Route = createFileRoute("/")({
+  loaderDeps: ({ search }) => ({ lng: search.lng }),
+  loader: async ({ context: { locale } }) => {
+    const projectsQuery = getProjects({ data: locale });
+    const companiesQuery = getCompanies({ data: locale });
+    const [{ copy, cases, clients }, env] = await Promise.all([getHomeContent({ data: locale }), getPublicEnv()]);
+    return {
+      locale,
+      origin: env.SITE_URL,
+      description: copy["description"],
+      copy,
+      cases,
+      clients,
+      projectsQuery,
+      companiesQuery,
+    };
   },
-];
-
-export const meta: MetaFunction<typeof loader> = ({ data, matches }) => {
-  const locale = (matches.find((m) => m.id === "root")?.data as { locale?: string } | undefined)?.locale ?? "en";
-  const origin = "https://portfolio-kurobanes-projects.vercel.app";
-  return [
-    ...getMeta({
+  headers: () => ({
+    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
+    "CDN-Cache-Control": "public, s-maxage=60",
+    Vary: "Cookie",
+  }),
+  head: ({ loaderData }) => {
+    const origin = loaderData?.origin ?? "";
+    const { meta, links } = getMeta({
       title: "Kurobane (Icaro)",
-      description: data?.description,
+      description: loaderData?.description,
       canonical: origin,
       openGraph: {
         type: "website",
-        locale: ogLocale(locale),
+        locale: ogLocale(loaderData?.locale ?? "en"),
         siteName: "Kurobane (Icaro)",
         images: [{
           url: "https://github.com/kurobaneshin.png",
         }],
       },
-    }),
-    { "script:ld+json": { "@context": "https://schema.org", ...person(origin) } },
-  ];
-};
-
-const contactSchema = z.object({
-  email: z.string({ message: "required" }).email({ message: "email" }),
-  message: z.string({ message: "required" }),
-  name: z.string({ message: "required" }),
+    });
+    return {
+      meta,
+      links: [
+        ...links,
+        { rel: "preload", href: "https://github.com/kurobaneshin.png", as: "image" },
+        {
+          rel: "preload",
+          href: "https://avatars.githubusercontent.com/u/47834261?v=4",
+          as: "image",
+        },
+      ],
+      scripts: [ldJson({ "@context": "https://schema.org", ...person(origin) })],
+    };
+  },
+  component: Index,
 });
-
-export const headers: HeadersFunction = () => {
-  return {
-    "Cache-Control": "s-maxage=1, stale-while-revalidate=59, public",
-    "CDN-Cache-Control": "public, s-maxage=60",
-    "Vercel-CDN-Cache-Control": "public, s-maxage=3600",
-  };
-};
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const [t, locale] = await Promise.all([
-    i18nServer.getFixedT(request),
-    i18nServer.getLocale(request),
-  ]);
-
-  const projectsQuery = async () => {
-    const data = await cachified({
-      key: `projects-${locale}`,
-      ttl: 1000 * 60 * 60 * 24,
-      async getFreshValue() {
-        const res = await supabase.from("projects")
-          .select("*").eq("lang", locale);
-
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return res.data;
-      },
-    });
-    return data;
-  };
-
-  const companiesQuery = async () => {
-    const data = await cachified({
-      key: `companies-${locale}`,
-      ttl: 1000 * 60 * 60 * 24,
-      async getFreshValue() {
-        const res = await supabase.from("companies").select("*").eq(
-          "lang",
-          locale,
-        ).order("end", {
-          nullsFirst: true,
-          ascending: false,
-        });
-
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-        return res.data;
-      },
-    });
-    return data;
-  };
-
-  return {
-    description: t("description"),
-    projectsQuery: projectsQuery(),
-    companiesQuery: companiesQuery(),
-  };
-};
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: contactSchema });
-
-  if (submission.status !== "success") {
-    return json(submission.reply());
-  }
-
-  const { name, email, message } = submission.value;
-
-  const from = "kurobane@peropero.site";
-  const to = process.env.NODE_ENV !== "production"
-    ? "delivered@resend.dev"
-    : "icarofdiniz@gmail.com";
-
-  const esc = (s: string) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-
-  const { error } = await resend.emails.send({
-    from,
-    to: [
-      to,
-    ],
-    subject: "hire",
-    html: `
-    <div>
-      <h1>Hi, my name is ${esc(name)}</h1>
-      <p>Email: ${esc(email)}</p>
-      <p>${esc(message)}</p>
-    </div>
-    `,
-  });
-
-  if (error) {
-    console.error("resend", error);
-    return jsonWithError(
-      {},
-      { message: "Email not sent", description: "try again later" },
-    );
-  }
-
-  return jsonWithSuccess(
-    {},
-    { message: "Email sent", description: "tank you for contacting me" },
-  );
-};
-
-const CASES = [
-  "media",
-  "sharecare",
-  "cloudkitchens",
-  "minhasinscricoes",
-  "jveiga",
-  "confiou",
-] as const;
-
-const CLIENTS = [
-  "sharecare",
-  "cloudkitchens",
-  "minhasinscricoes",
-  "jveiga",
-] as const;
 
 const CAPABILITIES: { key: string; name: string; icon: IconType }[] = [
   { key: "go", name: "Go", icon: FaGolang },
@@ -340,18 +223,24 @@ function SectionHead({
   );
 }
 
-export default function Index() {
+function Index() {
   const { t } = useTranslation();
-  const { projectsQuery, companiesQuery } = useLoaderData<typeof loader>();
+  const { projectsQuery, companiesQuery, copy, cases, clients } = Route.useLoaderData();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
-  const lastResult = useActionData<typeof action>();
-  const [form, fields] = useForm({
+  const [lastResult, setLastResult] = useState<SubmissionResult>();
+  const [form, fields] = useForm<z.infer<typeof contactSchema>>({
     lastResult,
+    async onSubmit(event, { formData }) {
+      event.preventDefault();
+      const res = await sendContact({ data: formData });
+      if (res.reply) setLastResult(res.reply);
+      if (res.toast) toast(res.toast.message, { description: res.toast.description });
+    },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: contactSchema });
     },
@@ -430,18 +319,18 @@ export default function Index() {
           />
           <div className="relative mx-auto grid max-w-[1280px] gap-12 px-5 pb-20 pt-16 md:grid-cols-12 md:px-10 md:pb-28 md:pt-24">
             <div className="md:col-span-8">
-              <p className="eyebrow animate-rise">{t("hero.eyebrow")}</p>
+              <p className="eyebrow animate-rise">{copy["hero.eyebrow"]}</p>
               <h1
                 className="mt-8 animate-rise text-[2.6rem] font-light leading-[1.02] tracking-[-0.025em] sm:text-6xl lg:text-[5.25rem]"
                 style={{ animationDelay: "80ms" }}
               >
-                {t("hero.headline")}
+                {copy["hero.headline"]}
               </h1>
               <p
                 className="mt-8 max-w-[58ch] animate-rise text-lg leading-relaxed text-muted-foreground"
                 style={{ animationDelay: "180ms" }}
               >
-                {t("description")}
+                {copy["description"]}
               </p>
               <div
                 className="mt-10 flex animate-rise flex-wrap items-center gap-3"
@@ -477,32 +366,32 @@ export default function Index() {
                 />
                 <div className="space-y-1">
                   <p className="font-display text-lg leading-none">Ícaro Diniz</p>
-                  <p className="eyebrow">{t("hero.location")}</p>
+                  <p className="eyebrow">{copy["hero.location"]}</p>
                   <p className="flex items-center gap-2 font-mono text-xs text-foreground">
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal opacity-60" />
                       <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-signal" />
                     </span>
-                    {t("hero.available")}
+                    {copy["hero.available"]}
                   </p>
                 </div>
               </div>
-              <p className="eyebrow mt-8">{t("hero.clientsTitle")}</p>
+              <p className="eyebrow mt-8">{copy["hero.clientsTitle"]}</p>
               <ul className="mt-4 border-t">
-                {CLIENTS.map((k) => (
-                  <li key={k}>
+                {clients.map((cl) => (
+                  <li key={cl.slug}>
                     <a
                       href="#cases"
                       className="group flex items-baseline gap-3 border-b py-3.5 transition-colors"
                     >
                       <span className="font-display text-[1.6rem] font-light leading-none tracking-[-0.01em] transition-colors group-hover:text-signal">
-                        {t(`hero.clients.${k}.name`)}
+                        {cl.name}
                       </span>
                       <span
                         aria-hidden
                         className="mb-1 flex-1 border-b border-dotted border-muted-foreground/40"
                       />
-                      <span className="eyebrow">{t(`hero.clients.${k}.sector`)}</span>
+                      <span className="eyebrow">{cl.sector}</span>
                     </a>
                   </li>
                 ))}
@@ -513,27 +402,27 @@ export default function Index() {
 
         {/* Cases: the ledger */}
         <section id="cases" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
-          <SectionHead index={1} title={t("cases.title")} description={t("cases.description")} />
+          <SectionHead index={1} title={copy["cases.title"]} description={copy["cases.description"]} />
           <ol className="mt-14 border-b">
-            {CASES.map((c, i) => (
-              <li key={c}>
+            {cases.map((c, i) => (
+              <li key={c.slug}>
                 <Reveal delay={i * 0.04}>
                   <article className="group grid gap-4 border-t py-8 transition-colors hover:bg-card md:grid-cols-12 md:gap-8 md:py-10">
                     <p className="font-mono text-xs tabular-nums text-muted-foreground transition-colors group-hover:text-signal md:col-span-1">
                       № {pad(i + 1)}
                     </p>
                     <div className="md:col-span-3">
-                      <p className="eyebrow">{t(`cases.${c}.client`)}</p>
+                      <p className="eyebrow">{c.client}</p>
                       <h3 className="mt-2 font-sans text-lg font-medium leading-snug">
-                        {t(`cases.${c}.title`)}
+                        {c.title}
                       </h3>
                     </div>
                     <div className="md:col-span-8">
                       <p className="font-display text-2xl font-light leading-tight tracking-[-0.01em] sm:text-3xl">
-                        {t(`cases.${c}.metric`)}
+                        {c.metric}
                       </p>
                       <p className="mt-3 max-w-[64ch] leading-relaxed text-muted-foreground">
-                        {t(`cases.${c}.detail`)}
+                        {c.detail}
                       </p>
                     </div>
                   </article>
@@ -546,10 +435,9 @@ export default function Index() {
         {/* Projects */}
         <section id="projects" className="scroll-mt-14 border-y bg-card">
           <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
-            <SectionHead index={2} title={t("featured.title")} description={t("featured.description")} />
+            <SectionHead index={2} title={copy["featured.title"]} description={copy["featured.description"]} />
             <div className="mt-14 grid border-l border-t sm:grid-cols-2 lg:grid-cols-3">
-              <Suspense fallback={<p className="eyebrow p-6">…</p>}>
-                <Await resolve={projectsQuery}>
+              <Await promise={projectsQuery} fallback={<p className="eyebrow p-6">…</p>}>
                   {(projects) =>
                     [...projects].reverse().map((p, i) => (
                       <a
@@ -575,14 +463,13 @@ export default function Index() {
                       </a>
                     ))}
                 </Await>
-              </Suspense>
             </div>
           </div>
         </section>
 
         {/* Capabilities */}
         <section id="skills" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
-          <SectionHead index={3} title={t("skills.title")} description={t("skills.description")} />
+          <SectionHead index={3} title={copy["skills.title"]} description={copy["skills.description"]} />
           <div className="mt-14 grid gap-px overflow-hidden border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {CAPABILITIES.map((c, i) => (
               <Reveal key={c.key} delay={i * 0.05} className="bg-background">
@@ -604,10 +491,10 @@ export default function Index() {
         {/* Experience */}
         <section id="experience" className="scroll-mt-14 border-t bg-card">
           <div className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28">
-            <SectionHead index={4} title={t("exp.title")} description={t("exp.description")} />
+            <SectionHead index={4} title={copy["exp.title"]} description={copy["exp.description"]} />
             <ol className="mt-14 border-b">
-              <Suspense fallback={<li className="eyebrow py-6">…</li>}>
-                <Await resolve={companiesQuery} errorElement={<li className="eyebrow py-6">—</li>}>
+              <CatchBoundary getResetKey={() => "companies"} errorComponent={() => <li className="eyebrow py-6">—</li>}>
+                <Await promise={companiesQuery} fallback={<li className="eyebrow py-6">…</li>}>
                   {(companies) =>
                     [...companies]
                       .sort(
@@ -640,14 +527,14 @@ export default function Index() {
                       </li>
                     ))}
                 </Await>
-              </Suspense>
+                </CatchBoundary>
             </ol>
           </div>
         </section>
 
         {/* Stack */}
         <section id="expertise" className="mx-auto max-w-[1280px] scroll-mt-14 px-5 py-20 md:px-10 md:py-28">
-          <SectionHead index={5} title={t("expertise.title")} description={t("expertise.description")} />
+          <SectionHead index={5} title={copy["expertise.title"]} description={copy["expertise.description"]} />
           <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {STACK.map((g) => (
               <Reveal key={g.group}>
@@ -681,13 +568,13 @@ export default function Index() {
                 <span className="text-signal">§ 06</span>
               </p>
               <h2 className="mt-6 text-5xl font-light leading-[1.02] tracking-[-0.025em] lg:text-7xl">
-                {t("touch.title")}
+                {copy["touch.title"]}
               </h2>
               <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-primary-foreground/70">
-                {t("touch.description")}
+                {copy["touch.description"]}
               </p>
             </div>
-            <Form
+            <form
               method="post"
               id={form.id}
               onSubmit={form.onSubmit}
@@ -736,7 +623,7 @@ export default function Index() {
                 {t("touch.inputs.submit")}
                 <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </button>
-            </Form>
+            </form>
           </div>
         </section>
       </main>
@@ -746,14 +633,7 @@ export default function Index() {
           <p className="eyebrow">
             © {new Date().getFullYear()} Kurobane
           </p>
-          <a
-            href="https://github.com/KurobaneShin"
-            target="_blank"
-            rel="noreferrer"
-            className="eyebrow transition-colors hover:text-signal sm:ml-auto"
-          >
-            github.com/KurobaneShin ↗
-          </a>
+          <SocialLinks className="sm:ml-auto" />
         </div>
       </footer>
     </div>

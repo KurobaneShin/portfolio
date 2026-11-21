@@ -2,5 +2,7 @@ node_modules
 
 /.cache
 /build
+/.output
+/.vercel
 .env
 /tmp
