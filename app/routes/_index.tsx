@@ -189,7 +189,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const CASES = [
-  "globo",
+  "media",
   "sharecare",
   "cloudkitchens",
   "minhasinscricoes",
@@ -198,10 +198,8 @@ const CASES = [
 ] as const;
 
 const CLIENTS = [
-  "globo",
   "sharecare",
   "cloudkitchens",
-  "casacor",
   "minhasinscricoes",
   "jveiga",
 ] as const;

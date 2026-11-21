@@ -11,10 +11,8 @@ export default {
     location: "Brasil · UTC−3",
     clientsTitle: "Com quem trabalhei",
     clients: {
-      globo: { name: "Grupo Globo", sector: "mídia" },
       sharecare: { name: "Sharecare", sector: "saúde" },
       cloudkitchens: { name: "CloudKitchens", sector: "food-tech" },
-      casacor: { name: "CasaCor", sector: "editorial" },
       minhasinscricoes: { name: "MinhasInscrições", sector: "eventos" },
       jveiga: { name: "J. Veiga", sector: "construção" },
     },
@@ -53,8 +51,8 @@ export default {
     title: "Casos",
     description:
       "Trabalho com sistemas onde erro custa caro: bilheteria de grandes eventos, financeiro de plataformas de pagamento, conteúdo de saúde em escala e dados que embasam decisões de diretoria. O método é o mesmo em qualquer setor: todo número bate com a fonte, toda melhoria de performance é medida antes e depois, e toda infraestrutura fica em código.",
-    globo: {
-      client: "Grupo Globo",
+    media: {
+      client: "Grande grupo de mídia",
       title: "Bilheteria",
       metric: "264 recursos de nuvem validados antes do primeiro deploy",
       detail:
