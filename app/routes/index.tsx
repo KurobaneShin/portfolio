@@ -80,7 +80,7 @@ export const Route = createFileRoute("/")({
 });
 
 const CASES = [
-  "globo",
+  "media",
   "sharecare",
   "cloudkitchens",
   "minhasinscricoes",
@@ -89,10 +89,8 @@ const CASES = [
 ] as const;
 
 const CLIENTS = [
-  "globo",
   "sharecare",
   "cloudkitchens",
-  "casacor",
   "minhasinscricoes",
   "jveiga",
 ] as const;

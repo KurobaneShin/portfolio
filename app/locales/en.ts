@@ -11,10 +11,8 @@ export default {
     location: "Brazil · UTC−3",
     clientsTitle: "Who I have worked with",
     clients: {
-      globo: { name: "Grupo Globo", sector: "media" },
       sharecare: { name: "Sharecare", sector: "healthcare" },
       cloudkitchens: { name: "CloudKitchens", sector: "food-tech" },
-      casacor: { name: "CasaCor", sector: "editorial" },
       minhasinscricoes: { name: "MinhasInscrições", sector: "events" },
       jveiga: { name: "J. Veiga", sector: "construction" },
     },
@@ -53,8 +51,8 @@ export default {
     title: "Case studies",
     description:
       "I work on systems where mistakes are expensive: ticketing for major events, finance for payment platforms, healthcare content at scale and the data leadership decides on. The method is the same in every industry: every number matches its source, every performance gain is measured before and after, and all infrastructure lives in code.",
-    globo: {
-      client: "Grupo Globo · via E-Tech",
+    media: {
+      client: "Major Brazilian media group · via E-Tech",
       title: "Ticketing",
       metric: "264 cloud resources validated before the first deploy",
       detail:
