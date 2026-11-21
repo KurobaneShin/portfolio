@@ -54,7 +54,7 @@ export default {
     description:
       "Trabalho com sistemas onde erro custa caro: bilheteria de grandes eventos, financeiro de plataformas de pagamento, conteúdo de saúde em escala e dados que embasam decisões de diretoria. O método é o mesmo em qualquer setor: todo número bate com a fonte, toda melhoria de performance é medida antes e depois, e toda infraestrutura fica em código.",
     globo: {
-      client: "Grupo Globo",
+      client: "Grupo Globo · via E-Tech",
       title: "Bilheteria",
       metric: "264 recursos de nuvem validados antes do primeiro deploy",
       detail:
@@ -68,21 +68,21 @@ export default {
         "256 testes em cerca de 115 s. Eliminei uma renderização duplicada que ocupava 28% do HTML e impedi que falhas passageiras virassem 404 em cache na CDN.",
     },
     cloudkitchens: {
-      client: "CloudKitchens LATAM",
+      client: "CloudKitchens LATAM · via E-Tech",
       title: "Dashboards de S&OP e faturamento",
       metric: "Paridade exata com 14 planilhas de faturamento",
       detail:
         "Dashboards portados do Looker com tabelas idênticas byte a byte. Uma correção no faturamento reduziu o valor não cobrado de R$ 17,4 mil para R$ 954.",
     },
     minhasinscricoes: {
-      client: "MinhasInscrições",
+      client: "MinhasInscrições · via E-Tech",
       title: "Financeiro de eventos",
       metric: "39 de 40 conferem com o sistema legado (o 40º era bug do legado)",
       detail:
         "Relatórios financeiros e antecipação de recebíveis na AWS (ECS Fargate + Terraform). Encontrei uma tarifa de TED cobrada em dobro nos relatórios de produção.",
     },
     jveiga: {
-      client: "J. Veiga",
+      client: "J. Veiga · via E-Tech",
       title: "Dados de obra, vendas e caixa",
       metric: "De 6 falhas em 17 dias para recuperação automática",
       detail:

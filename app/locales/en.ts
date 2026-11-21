@@ -54,7 +54,7 @@ export default {
     description:
       "I work on systems where mistakes are expensive: ticketing for major events, finance for payment platforms, healthcare content at scale and the data leadership decides on. The method is the same in every industry: every number matches its source, every performance gain is measured before and after, and all infrastructure lives in code.",
     globo: {
-      client: "Grupo Globo",
+      client: "Grupo Globo · via E-Tech",
       title: "Ticketing",
       metric: "264 cloud resources validated before the first deploy",
       detail:
@@ -68,21 +68,21 @@ export default {
         "256 tests in about 115 s. Removed a duplicate server render that made up 28% of the HTML and stopped transient failures from becoming CDN-cached 404s.",
     },
     cloudkitchens: {
-      client: "CloudKitchens LATAM",
+      client: "CloudKitchens LATAM · via E-Tech",
       title: "S&OP dashboards and billing",
       metric: "Exact parity with 14 billing workbooks",
       detail:
         "Dashboards ported from Looker with byte-identical tables. A billing fix cut the uncharged amount from R$ 17.4k to R$ 954.",
     },
     minhasinscricoes: {
-      client: "MinhasInscrições",
+      client: "MinhasInscrições · via E-Tech",
       title: "Event finance",
       metric: "39 of 40 match the legacy engine (the 40th was a legacy bug)",
       detail:
         "Financial reports and receivables advances on AWS (ECS Fargate + Terraform). Found a wire-transfer fee charged twice in production reports.",
     },
     jveiga: {
-      client: "J. Veiga",
+      client: "J. Veiga · via E-Tech",
       title: "Construction, sales and cash-flow data",
       metric: "From 6 failures in 17 days to automatic recovery",
       detail:
