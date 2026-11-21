@@ -4,6 +4,8 @@ description: Em 30 dias, meus agentes ficaram parados mais de 5 minutos 600 veze
 date: 2026-11-25
 tag: ia
 image: /blog/agentes-cochilando/og-pt.jpg
+cover: /blog/agentes-cochilando/cover-pt.jpg
+video: /blog/agentes-cochilando/reel-pt.mp4
 ---
 Eu uso agente de IA pra quase tudo: rodar teste, revisar PR e até construir o meu MMO. Um dia fui medir quanto isso custa de verdade e achei um número ridículo.
 

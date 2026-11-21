@@ -33,6 +33,8 @@ export default {
     eyebrow: "Notes from the workbench",
     description: "What I learn building an MMO from scratch, shipping web systems and working with AI agents. With the numbers, and with the mistakes.",
     back: "All posts",
+    followTitle: "Follow the MMO build",
+    followText: "I post a piece almost every day on X, Instagram and LinkedIn: numbers, animations and the mistakes too.",
     discuss: "Discuss on LinkedIn",
     cta: "Want this kind of rigor on your project? Let's talk",
     tags: { mmo: "MMO", web: "Web", ia: "AI" },

@@ -4,6 +4,8 @@ description: Born in '99, started going to LAN centers at 4. Now I'm a web dev b
 date: 2026-11-23
 tag: mmo
 image: /blog/lan-house/og-en.jpg
+cover: /blog/lan-house/cover-en.jpg
+video: /blog/lan-house/hack-en.mp4
 ---
 I was born in '99 and started going to lan houses, Brazil's LAN centers, at 4. MU, Ragnarok, Priston Tale. I played Priston on private servers, with a guild, and there was always one guy who knew where the HP lived in the game's memory. I wanted to be that guy.
 

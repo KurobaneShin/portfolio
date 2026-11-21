@@ -31,6 +31,7 @@ import { RiCodeSSlashLine, RiNextjsFill, RiRemixRunFill, RiSpeedUpFill, RiTailwi
 import { BiLogoPostgresql } from "react-icons/bi";
 import { GrMysql, GrTools } from "react-icons/gr";
 import { IoLibrarySharp } from "react-icons/io5";
+import { SocialLinks } from "~/components/custom/SocialLinks";
 import { IconType } from "react-icons";
 
 export const Route = createFileRoute("/")({
@@ -641,14 +642,7 @@ function Index() {
           <p className="eyebrow">
             © {new Date().getFullYear()} Kurobane
           </p>
-          <a
-            href="https://github.com/KurobaneShin"
-            target="_blank"
-            rel="noreferrer"
-            className="eyebrow transition-colors hover:text-signal sm:ml-auto"
-          >
-            github.com/KurobaneShin ↗
-          </a>
+          <SocialLinks className="sm:ml-auto" />
         </div>
       </footer>
     </div>

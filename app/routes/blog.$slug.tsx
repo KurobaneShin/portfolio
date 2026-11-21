@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { SocialLinks } from "~/components/custom/SocialLinks";
 import { BlogShell } from "~/components/custom/BlogShell";
 import { getBlogPost } from "~/modules/blog.functions";
-import { AVATAR_URL, htmlLang, ogLocale, person } from "~/modules/person";
+import { AVATAR_URL, X_HANDLE, htmlLang, ogLocale, person } from "~/modules/person";
 import { getMeta, ldJson } from "~/modules/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -40,6 +42,8 @@ export const Route = createFileRoute("/blog/$slug")({
         ...meta,
         { property: "article:published_time", content: post.date },
         { name: "twitter:card", content: post.image ? "summary_large_image" : "summary" },
+        { name: "twitter:site", content: X_HANDLE },
+        { name: "twitter:creator", content: X_HANDLE },
       ],
       links: [
         ...links,
@@ -83,16 +87,14 @@ function BlogPost() {
         <h1 className="mt-4 font-display text-4xl leading-tight tracking-tight md:text-5xl">{post.title}</h1>
         <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{post.description}</p>
         {post.video && (
-          <video
-            className="mx-auto mt-10 w-full max-w-[360px] border"
-            src={post.video}
-            poster={post.cover}
-            controls
-            playsInline
-            preload="metadata"
-          />
+          <LoopVideo src={post.video} poster={post.cover} />
         )}
         <div className="blog-prose mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
+        <aside className="mt-16 border p-6">
+          <p className="font-display text-2xl tracking-tight">{t("blog.followTitle")}</p>
+          <p className="mt-2 leading-relaxed text-muted-foreground">{t("blog.followText")}</p>
+          <SocialLinks className="mt-4" />
+        </aside>
         <div className="mt-16 flex flex-col gap-4 border-t pt-8 sm:flex-row sm:justify-between">
           {post.linkedin && (
             <a href={post.linkedin} target="_blank" rel="noreferrer" className="eyebrow transition-colors hover:text-signal">
@@ -103,5 +105,31 @@ function BlogPost() {
         </div>
       </article>
     </BlogShell>
+  );
+}
+
+// Plays like a GIF: muted, looping, inline. React does not render the muted
+// attribute on the server, so autoplay is started after hydration.
+function LoopVideo({ src, poster }: { src: string; poster?: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    v.muted = true;
+    v.play().catch(() => {});
+  }, []);
+  return (
+    <video
+      ref={ref}
+      className="mx-auto mt-10 w-full max-w-[360px] border"
+      src={src}
+      poster={poster}
+      autoPlay
+      muted
+      loop
+      playsInline
+      controls
+      preload="auto"
+    />
   );
 }

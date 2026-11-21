@@ -4,6 +4,8 @@ description: In 30 days my agents sat idle for over 5 minutes 600 times. 357 of 
 date: 2026-11-25
 tag: ia
 image: /blog/agentes-cochilando/og-en.jpg
+cover: /blog/agentes-cochilando/cover-en.jpg
+video: /blog/agentes-cochilando/reel-en.mp4
 ---
 I use AI agents for almost everything: running tests, reviewing PRs, even building my MMO. One day I measured what that actually costs and found a ridiculous number.
 

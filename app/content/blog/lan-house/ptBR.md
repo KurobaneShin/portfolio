@@ -4,6 +4,8 @@ description: Nasci em 99 e ia pra lan house desde os 4 anos. Hoje sou dev web e 
 date: 2026-11-23
 tag: mmo
 image: /blog/lan-house/og-pt.jpg
+cover: /blog/lan-house/cover-pt.jpg
+video: /blog/lan-house/hack-pt.mp4
 ---
 Nasci em 99 e ia pra lan house desde os 4 anos. MU, Ragnarok, Priston Tale. O Priston eu jogava em servidor privado, com guild, e sempre tinha um cara que sabia achar o HP na memória do jogo. Eu queria ser esse cara.
 

@@ -33,6 +33,8 @@ export default {
     eyebrow: "Anotações da bancada",
     description: "O que eu aprendo fazendo um MMO do zero, entregando sistemas web e trabalhando com agentes de IA. Com os números e com os erros.",
     back: "Todos os posts",
+    followTitle: "Acompanhe o meu MMO",
+    followText: "Posto um pedaço quase todo dia no X, no Instagram e no LinkedIn: números, animações e os erros também.",
     discuss: "Comente no LinkedIn",
     cta: "Quer esse rigor no seu projeto? Vamos conversar",
     tags: { mmo: "MMO", web: "Web", ia: "IA" },
