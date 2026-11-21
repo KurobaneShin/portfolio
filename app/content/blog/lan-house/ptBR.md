@@ -15,9 +15,15 @@ Metade das vezes não dava em nada, e eu não fazia ideia do porquê.
 
 ## Corta pra hoje
 
-Hoje sou dev web. Faço API de ingresso, relatório financeiro, essas coisas. Passo o dia garantindo que número no sistema bate com número na fonte. Jogo mesmo, nunca fiz.
+Hoje sou dev web. Faço API de ingresso, relatório financeiro, essas coisas. Passo o dia garantindo que número no sistema bate com número na fonte.
 
-Então resolvi fazer um MMO. Do zero, em C++, com servidor próprio. Sem Unity, sem Unreal.
+Jogo, fiz um só. Em setembro de 2024, num teste técnico pra uma vaga na [Revi](https://www.userevi.com/), fiz uma luta de monstros no navegador: você cria os monstros, escolhe dois e eles brigam sozinhos, um golpe a cada meio segundo, até alguém zerar o HP. Saiu num fim de semana, em React. [O código tá aberto](https://github.com/KurobaneShin/revi-test).
+
+Foi uma das melhores entrevistas que já fiz. O [Marcelo Miyachi](https://www.linkedin.com/in/marcelomiyachi/), CTO da Revi, entrou no código de verdade: animação, separação dos componentes, validação dos inputs. E eu ainda entreguei um bug que ele não tinha pego: a regra pedia que todo golpe tirasse pelo menos 1 de HP, e no meu código, se a defesa fosse maior que o ataque, o golpe curava. Valeu, Marcelo.
+
+Relendo hoje, achei mais uma: o HP dos monstros ficava no `sessionStorage` do navegador. Qualquer um abria o DevTools e trocava o valor. Eu tinha feito exatamente o jogo que eu tentava hackear na lan house.
+
+Jogo com servidor e outros jogadores, nunca fiz. Então resolvi fazer um MMO. Do zero, em C++, com servidor próprio. Sem Unity, sem Unreal.
 
 Pode ser que nunca vire jogo de verdade, e tudo bem. A ideia é aprender o que a web nunca me obrigou a aprender:
 

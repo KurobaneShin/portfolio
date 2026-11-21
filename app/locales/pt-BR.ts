@@ -1,15 +1,15 @@
 export default {
   title: "Kurobane",
   description:
-    "Engenheiro de software sênior. Construo e conserto sistemas críticos (bilheteria, financeiro, plataformas de conteúdo e dados) em mídia, saúde, food-tech e construção, sempre com números que conferem com a fonte, performance medida e infraestrutura em código.",
+    "Sou o Ícaro, ou Kurobane. Pago as contas construindo e consertando sistemas de bilheteria, financeiro e dados para empresas de saúde, mídia, food-tech, eventos e construção. O resto do tempo vai para um MMO em C++ feito do zero, e eu conto tudo aqui no blog.",
   hire: "Me contrate",
   seeProjects: "Meus Projetos",
   hero: {
-    headline: "Sistemas críticos, com números que batem com a fonte.",
-    eyebrow: "Engenharia de software · Sistemas críticos",
-    available: "Aceitando novos projetos",
+    headline: "Construo e conserto sistemas onde erro custa dinheiro.",
+    eyebrow: "Ícaro \"Kurobane\" · Sistemas em produção e um MMO em C++",
+    available: "Agenda aberta para novos contratos",
     location: "Brasil · UTC−3",
-    clientsTitle: "Com quem trabalhei",
+    clientsTitle: "Times que já confiaram no meu código",
     clients: {
       sharecare: { name: "Sharecare", sector: "saúde" },
       cloudkitchens: { name: "CloudKitchens", sector: "food-tech" },
@@ -50,9 +50,9 @@ export default {
     contact: "Contato",
   },
   cases: {
-    title: "Casos",
+    title: "Projetos em destaque",
     description:
-      "Trabalho com sistemas onde erro custa caro: bilheteria de grandes eventos, financeiro de plataformas de pagamento, conteúdo de saúde em escala e dados que embasam decisões de diretoria. O método é o mesmo em qualquer setor: todo número bate com a fonte, toda melhoria de performance é medida antes e depois, e toda infraestrutura fica em código.",
+      "Bilheteria de evento grande, financeiro de pagamento, conteúdo de saúde em escala e dados que chegam na mesa da diretoria. Sem achismo nem infra clicada na mão: tudo aqui tem número batendo com a fonte e performance medida antes e depois.",
     media: {
       client: "Grande grupo de mídia · via E-Tech",
       title: "Bilheteria",

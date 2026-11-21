@@ -1,15 +1,15 @@
 export default {
   title: "Kurobane",
   description:
-    "Senior software engineer. I build and fix critical systems (ticketing, finance, content platforms and data) across media, healthcare, food-tech and construction, always with numbers that match the source, measured performance and infrastructure as code.",
+    "I'm Ícaro, aka Kurobane. I pay the bills building and fixing ticketing, finance and data systems for teams in healthcare, media, food-tech, events and construction. The rest of my time goes into a C++ MMO built from scratch, and I write it all up on the blog.",
   hire: "Hire me",
   seeProjects: "View Projects",
   hero: {
-    headline: "Critical systems, with numbers that match the source.",
-    eyebrow: "Software engineering · Critical systems",
-    available: "Taking on new projects",
+    headline: "I build and fix systems where bugs get expensive.",
+    eyebrow: "Ícaro \"Kurobane\" · Production systems and a C++ MMO",
+    available: "Open for select client work",
     location: "Brazil · UTC−3",
-    clientsTitle: "Who I have worked with",
+    clientsTitle: "Companies I've shipped for",
     clients: {
       sharecare: { name: "Sharecare", sector: "healthcare" },
       cloudkitchens: { name: "CloudKitchens", sector: "food-tech" },
@@ -50,9 +50,9 @@ export default {
     contact: "Contact",
   },
   cases: {
-    title: "Case studies",
+    title: "Selected work",
     description:
-      "I work on systems where mistakes are expensive: ticketing for major events, finance for payment platforms, healthcare content at scale and the data leadership decides on. The method is the same in every industry: every number matches its source, every performance gain is measured before and after, and all infrastructure lives in code.",
+      "Major event ticketing, payment finance, healthcare content at scale and data that lands on the executive table. No guesswork, no hand-clicked infrastructure: every number here matches its source and every speedup was measured.",
     media: {
       client: "Major Brazilian media group · via E-Tech",
       title: "Ticketing",

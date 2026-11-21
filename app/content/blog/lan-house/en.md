@@ -15,9 +15,15 @@ Half the time nothing happened, and I had no idea why.
 
 ## Fast forward
 
-Today I'm a web dev. Ticketing APIs, financial reports, that kind of thing. I spend my days making sure the numbers in the system match the numbers at the source. I've never made a game.
+Today I'm a web dev. Ticketing APIs, financial reports, that kind of thing. I spend my days making sure the numbers in the system match the numbers at the source.
 
-So I decided to build an MMO. From scratch, in C++, with my own server. No Unity, no Unreal.
+I've made exactly one game. In September 2024, for a take-home test while interviewing at [Revi](https://www.userevi.com/), I built a monster fight in the browser: you create monsters, pick two, and they fight on their own, one hit every half second, until someone's HP hits zero. One weekend, React. [The code is public](https://github.com/KurobaneShin/revi-test).
+
+It was one of the best interviews I've ever had. [Marcelo Miyachi](https://www.linkedin.com/in/marcelomiyachi/), Revi's CTO, went deep into the code: animations, how the components were split, input validation. And I ended up pointing out a bug he hadn't caught: the rules said every hit had to deal at least 1 damage, but in my code, if defense was higher than attack, the hit healed. Thanks, Marcelo.
+
+Reading it again now, I found one more: the monsters' HP lived in the browser's `sessionStorage`. Anyone could open DevTools and change it. I had built exactly the kind of game I used to try to hack at the lan house.
+
+A game with a server and other players, I've never made. So I decided to build an MMO. From scratch, in C++, with my own server. No Unity, no Unreal.
 
 It may never become a real game, and that's fine. The point is to learn what the web never forced me to:
 
