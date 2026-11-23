@@ -12,6 +12,8 @@ npm run dev
 
 ## Deployment
 
+Production: every push to `main` deploys kurobane.com.br through Coolify (build on the VPS, rolling update gated on the Dockerfile `HEALTHCHECK`, Cloudflare purge after the deploy).
+
 First, build your app for production:
 
 ```sh
