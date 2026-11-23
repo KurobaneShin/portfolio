@@ -9,7 +9,6 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc",
-    "test": "bun test tests",
     "gentypes": "supabase gen types typescript --project-id zdtmstdisjgmchptatqx > database.types.ts"
   },
   "dependencies": {

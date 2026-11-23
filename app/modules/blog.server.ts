@@ -1,5 +1,4 @@
 import { marked } from "marked";
-import { isLive } from "~/modules/blog.schedule";
 import { cached, pickLocale } from "~/modules/content.server";
 import { supabase } from "~/modules/supabase.server";
 
@@ -41,11 +40,9 @@ const loadPosts = () =>
     }));
   });
 
-const livePosts = async () => (await loadPosts()).filter((p) => isLive(p.date));
-
 /** The post in the asked locale, or in the other one when it has no translation. */
 export async function getPost(slug: string, locale: Locale): Promise<Post | undefined> {
-  return pickLocale((await livePosts()).filter((p) => p.slug === slug), locale)[0];
+  return pickLocale((await loadPosts()).filter((p) => p.slug === slug), locale)[0];
 }
 
 export async function listPosts(locale: Locale): Promise<PostMeta[]> {
@@ -55,11 +52,11 @@ export async function listPosts(locale: Locale): Promise<PostMeta[]> {
 }
 
 export async function localesOf(slug: string): Promise<Locale[]> {
-  return (await livePosts()).filter((p) => p.slug === slug).map((p) => p.locale);
+  return (await loadPosts()).filter((p) => p.slug === slug).map((p) => p.locale);
 }
 
 export async function listSlugs(): Promise<string[]> {
-  return [...new Set((await livePosts()).map((p) => p.slug))];
+  return [...new Set((await loadPosts()).map((p) => p.slug))];
 }
 
 export const asLocale = (value: string | undefined): Locale => (value === "ptBR" ? "ptBR" : "en");
