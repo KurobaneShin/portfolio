@@ -49,7 +49,7 @@ export async function getPost(slug: string, locale: Locale): Promise<Post | unde
 }
 
 export async function listPosts(locale: Locale): Promise<PostMeta[]> {
-  return pickLocale(await livePosts(), locale)
+  return pickLocale(await loadPosts(), locale)
     .map(({ html: _html, ...meta }) => meta)
     .sort((a, b) => b.date.localeCompare(a.date));
 }
