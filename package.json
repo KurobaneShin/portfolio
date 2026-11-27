@@ -23,7 +23,7 @@
     "@tanstack/react-start": "^1.169.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cssnano": "^7.1.9",
+    "cssnano": "^9.9.0",
     "framer-motion": "^14.14.0",
     "i18next": "^27.2.2",
     "lru-cache": "^11.5.3",
